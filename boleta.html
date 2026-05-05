@@ -5,45 +5,28 @@
     <title>Consulta de calificaciones - Colegio Niños Héroes</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
-         /* --- ESTILO HERO CON DEGRADADO (IGUAL A OFERTA EDUCATIVA) --- */
+        /* --- ESTILOS ORIGINALES --- */
+        :root { --azul-id: #193E9A; --verde-id: #2D8B7D; }
+        
         .hero {
             background: linear-gradient(135deg, #193E9A 0%, #317F77 100%);
-            padding: 80px 0;
+            padding: 60px 0;
             text-align: center;
             color: white;
             margin-bottom: 20px;
         }
 
-        .hero h1 {
-            font-weight: 800;
-            font-size: 3rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-        }
+        .hero h1 { font-weight: 800; font-size: 2.5rem; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); }
 
-        :root { --azul-id: #193E9A; --verde-id: #2D8B7D; }
         .btn-volver {
             border: 2px solid var(--azul-id);
             color: var(--azul-id);
             font-weight: 700;
             border-radius: 10px;
             padding: 5px 20px;
-            transition: 0.3s;
             text-decoration: none !important;
-        }
-        .btn-volver:hover { background: var(--azul-id); color: white; }
-
-        .search-hero {
-            background: linear-gradient(135deg, var(--azul-id), #0d2561);
-            height: 150px;
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            color: white; 
-            border-radius: 0 0 50px 50px;
-            margin-bottom: 40px;
         }
 
         .report-card-container {
@@ -52,56 +35,44 @@
             border: 1px solid #e0e0e0;
             border-radius: 8px;
             display: none; 
-            margin-bottom: 60px;
+            margin-bottom: 40px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.1);
         }
 
-        .report-header {
-            border-bottom: 3px double var(--azul-id);
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-        }
+        /* SALTO DE PÁGINA PARA IMPRESIÓN */
+        .page-break { page-break-before: always; }
+
+        .report-header { border-bottom: 3px double var(--azul-id); margin-bottom: 20px; padding-bottom: 10px; }
 
         .info-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 30px;
+            gap: 10px;
+            margin-bottom: 20px;
             background: #f8fafc;
-            padding: 20px;
+            padding: 15px;
             border-radius: 10px;
         }
 
         .grade-table { width: 100%; border: 2px solid #333; }
-        .grade-table th, .grade-table td {
-            border: 1px solid #333;
-            padding: 8px;
-            text-align: center;
-            font-size: 0.9rem;
-        }
+        .grade-table th, .grade-table td { border: 1px solid #333; padding: 6px; text-align: center; font-size: 0.85rem; }
         .grade-table th { background: #f4f4f4; font-weight: 700; }
 
         .footer-colegio { background-color: #193E9A; padding: 30px 0; margin-top: 50px; color: white; }
-        .texto-nowrap { white-space: nowrap; font-size: 0.95rem; }
-        .link-unete {
-            color: white !important; font-weight: 600; text-decoration: none; font-size: 0.9rem;
-            padding: 8px 18px; border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 25px;
-            display: inline-block; white-space: nowrap; transition: 0.3s;
-        }
-        .link-unete:hover { background-color: white; color: #193E9A !important; }
 
         @media print {
-            .navbar, .search-hero, footer, .btn-volver, .input-group, .instruccion, .btn-print-box { display: none !important; }
+            .navbar, .hero, .instruccion, .input-group, .btn-print-box, footer, #statusMsg { display: none !important; }
             .report-card-container { display: block !important; border: none; box-shadow: none; margin: 0; padding: 0; }
+            body { background: white; }
         }
     </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">
         <div class="container d-flex justify-content-between align-items-center">
             <a class="navbar-brand" href="index.html">
-                <img src="Iconos/logo.png" class="logo-colegio" style="height: 50px;"> Colegio Niños Héroes
+                <img src="Iconos/logo.png" style="height: 45px;"> Colegio Niños Héroes
             </a>
             <a href="comunidad.html" class="btn-volver">← Volver</a>
         </div>
@@ -114,87 +85,87 @@
     <div class="container">
         <div class="row justify-content-center mb-5">
             <div class="col-md-6 text-center">
-                <p class="instruccion">Ingrese la matrícula del alumno:</p>
+                <p class="instruccion">Ingrese la matrícula del alumno para obtener ambas boletas:</p>
                 <div class="input-group input-group-lg">
                     <input type="text" id="matriculaInput" class="form-control" placeholder="Matrícula..." style="border-radius: 30px 0 0 30px;">
                     <div class="input-group-append">
-                        <button class="btn" onclick="buscarBoleta()" style="background: var(--verde-id); color: white; border-radius: 0 30px 30px 0; padding: 0 30px; font-weight: 700;">Buscar</button>
+                        <button class="btn" onclick="buscarBoletas()" style="background: var(--verde-id); color: white; border-radius: 0 30px 30px 0; padding: 0 30px; font-weight: 700;">Buscar</button>
                     </div>
                 </div>
                 <div id="statusMsg" class="mt-3"></div>
+                <div class="text-center mt-3 btn-print-box" id="printBtnContainer" style="display:none;">
+                    <button class="btn btn-danger btn-lg" onclick="window.print()"><i class="fas fa-file-pdf"></i> Descargar ambas boletas (PDF)</button>
+                </div>
             </div>
         </div>
 
-        <div id="reportCard" class="report-card-container">
-            <div class="text-right mb-3 btn-print-box">
-                <button class="btn btn-danger" onclick="window.print()">Descargar PDF</button>
-            </div>
-
+        <div id="reportCardExtra" class="report-card-container">
             <div class="report-header">
                 <div class="row align-items-center">
                     <div class="col-8">
-                        <img src="Iconos/logo.png" alt="Logo Colegio" style="max-height: 70px; margin-bottom: 10px;">
+                        <img src="Iconos/logo.png" style="max-height: 60px;">
                         <h2 style="color: var(--azul-id); font-weight: 900; margin: 0;">Colegio Niños Héroes</h2>
-                        <p class="text-muted m-0" id="displayNivel">Reporte oficial de progreso académico</p>
+                        <p class="text-muted m-0"><strong id="displayNivelExtra">---</strong> | Extracurriculares</p>
                     </div>
                     <div class="col-4 text-right">
-                        <p class="m-0" id="displayCiclo"><strong>Ciclo:</strong> ---</p>
+                        <p class="m-0"><strong>Ciclo:</strong> <span id="displayCicloExtra">---</span></p>
                     </div>
                 </div>
             </div>
-
             <div class="info-grid">
-                <div><strong>Alumno:</strong> <span id="displayName">---</span></div>
-                <div><strong>Matrícula:</strong> <span id="displayMatricula">---</span></div>
-                <div><strong>Grado y Grupo:</strong> <span id="displayGradoGrupo">---</span></div>
+                <div><strong>Alumno:</strong> <span id="displayNameExtra">---</span></div>
+                <div><strong>Matrícula:</strong> <span id="displayMatriculaExtra">---</span></div>
+                <div><strong>Grado y Grupo:</strong> <span id="displayGradoGrupoExtra">---</span></div>
                 <div><strong>Estatus:</strong> Alumno Regular</div>
             </div>
-
             <table class="grade-table">
-                <thead id="tableHeader"></thead>
-                <tbody id="gradeRows"></tbody>
+                <thead id="tableHeaderExtra"></thead>
+                <tbody id="gradeRowsExtra"></tbody>
                 <tfoot>
-                    <tr style="background: #f4f4f4; font-weight: 800; font-size: 1.1rem;">
-                        <td id="promedioLabel" style="text-align: right;">PROMEDIO GENERAL FINAL DEL CICLO:</td>
-                        <td id="displayPromedio" style="color: var(--azul-id);">---</td>
+                    <tr style="background: #f4f4f4; font-weight: 800;">
+                        <td id="labelPromedioExtra" style="text-align: right;">PROMEDIO FINAL:</td>
+                        <td id="displayPromedioExtra" style="color: var(--azul-id);">---</td>
                     </tr>
                 </tfoot>
             </table>
+        </div>
 
-            <div class="row mt-5">
-                <div class="col-6 text-center">
-                    <div style="border-top: 1px solid #000; width: 200px; margin: 0 auto; padding-top: 5px;">
-                        <p class="small">Firma del padre o tutor</p>
+        <div id="reportCardIngles" class="report-card-container page-break">
+            <div class="report-header">
+                <div class="row align-items-center">
+                    <div class="col-8">
+                        <img src="Iconos/logo.png" style="max-height: 60px;">
+                        <h2 style="color: var(--azul-id); font-weight: 900; margin: 0;">Colegio Niños Héroes</h2>
+                        <p class="text-muted m-0"><strong id="displayNivelIngles">---</strong> | English Department</p>
                     </div>
-                </div>
-                <div class="col-6 text-center">
-                    <div style="border-top: 1px solid #000; width: 200px; margin: 0 auto; padding-top: 5px;">
-                        <p class="small">Sello de la institución</p>
+                    <div class="col-4 text-right">
+                        <p class="m-0"><strong>Ciclo:</strong> <span id="displayCicloIngles">---</span></p>
                     </div>
                 </div>
             </div>
+            <div class="info-grid">
+                <div><strong>Student:</strong> <span id="displayNameIngles">---</span></div>
+                <div><strong>ID:</strong> <span id="displayMatriculaIngles">---</span></div>
+                <div><strong>Grade:</strong> <span id="displayGradoGrupoIngles">---</span></div>
+                <div><strong>Status:</strong> Regular Student</div>
+            </div>
+            <table class="grade-table">
+                <thead id="tableHeaderIngles"></thead>
+                <tbody id="gradeRowsIngles"></tbody>
+                <tfoot>
+                    <tr style="background: #f4f4f4; font-weight: 800;">
+                        <td id="labelPromedioIngles" style="text-align: right;">FINAL AVERAGE:</td>
+                        <td id="displayPromedioIngles" style="color: var(--azul-id);">---</td>
+                    </tr>
+                </tfoot>
+            </table>
         </div>
     </div>
 
-    <footer class="footer-colegio">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-8 text-center text-md-left mb-3 mb-md-0">
-                    <p class="mb-0 text-white texto-nowrap">
-                        © 2026 <strong>Colegio Niños Héroes Atizapán</strong>. Todos los derechos reservados.
-                    </p>
-                </div>
-                <div class="col-md-4 text-center text-md-right">
-                    <a href="bolsa-trabajo.html" class="link-unete">
-                        <i class="fas fa-briefcase mr-2"></i>Únete a nuestro equipo
-                    </a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
 <script>
-    const sheetID = '12m7RYtCBAF-P6t8_hoS3TkJwVX0tHEf7uaHAs6m0pTs'; 
+    const idExtra = '12m7RYtCBAF-P6t8_hoS3TkJwVX0tHEf7uaHAs6m0pTs';
+    const idIngles = '1EY955TiJLZtpffxAtNQW3bjVuw8vHfYm_JYhX_6hXd4';
+    
     const niveles = [
         'Maternal', 'Kinder 1', 'Kinder 2', 'Kinder 3', 
         'Primaria 1', 'Primaria 2', 'Primaria 3', 'Primaria 4', 'Primaria 5', 'Primaria 6',
@@ -202,143 +173,117 @@
         'Preparatoria 1', 'Preparatoria 2', 'Preparatoria 3'
     ];
 
-    async function buscarBoleta() {
-        const inputRaw = document.getElementById('matriculaInput').value;
-        const matriculaInput = inputRaw.trim().toUpperCase(); 
+    async function buscarBoletas() {
+        const matricula = document.getElementById('matriculaInput').value.trim().toUpperCase();
         const status = document.getElementById('statusMsg');
         
-        if (!matriculaInput) {
-            status.innerHTML = "<span class='text-warning'>Por favor, ingrese una matrícula.</span>";
+        if (!matricula) {
+            status.innerHTML = "<span class='text-warning'>Ingrese una matrícula válida.</span>";
             return;
         }
 
-        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Extrayendo información de las materias...";
-        let alumnoEncontrado = null;
-        let nivelEncontrado = "";
+        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Consultando bases de datos...";
+        
+        // Ejecutamos ambas búsquedas en paralelo
+        const [dataExtra, dataIngles] = await Promise.all([
+            obtenerDatos(idExtra, matricula),
+            obtenerDatos(idIngles, matricula)
+        ]);
 
-        for (let nivel of niveles) {
-            const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(nivel)}&tqx=cb:${Date.now()}`;
+        if (dataExtra || dataIngles) {
+            status.innerHTML = "<span class='text-success'>Información localizada.</span>";
+            document.getElementById('printBtnContainer').style.display = 'block';
             
+            if (dataExtra) renderBoleta(dataExtra, 'Extra');
+            else document.getElementById('reportCardExtra').style.display = 'none';
+
+            if (dataIngles) renderBoleta(dataIngles, 'Ingles');
+            else document.getElementById('reportCardIngles').style.display = 'none';
+            
+        } else {
+            status.innerHTML = "<span class='text-danger'>Matrícula no encontrada en ningún registro.</span>";
+            document.getElementById('reportCardExtra').style.display = 'none';
+            document.getElementById('reportCardIngles').style.display = 'none';
+            document.getElementById('printBtnContainer').style.display = 'none';
+        }
+    }
+
+    async function obtenerDatos(sheetId, matricula) {
+        for (let nivel of niveles) {
+            const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(nivel)}&tqx=cb:${Date.now()}`;
             try {
                 const res = await fetch(url);
                 const csvText = await res.text();
                 const data = Papa.parse(csvText, { header: false, skipEmptyLines: true }).data;
                 
-                // Localizar fila donde está la "Matricula" (usualmente fila 2)
-                let headerRowIdx = data.findIndex(row => row[0] && row[0].toString().toLowerCase().includes('matricula'));
-                if (headerRowIdx === -1) continue;
+                let headerIdx = data.findIndex(row => row[0] && row[0].toString().toLowerCase().includes('matricula'));
+                if (headerIdx === -1) continue;
 
-                const filaMateriasNombres = data[headerRowIdx - 1] || []; 
-                const registrosAlumnos = data.slice(headerRowIdx + 1);
+                const headerNames = data[headerIdx - 1] || [];
+                const alumnos = data.slice(headerIdx + 1);
+                const fila = alumnos.find(row => row[0] && row[0].toString().trim().toUpperCase() === matricula);
 
-                const limpiar = (t) => t ? t.toString().trim().toUpperCase().replace(/[\u200B-\u200D\uFEFF]/g, "") : "";
-                const filaAlumno = registrosAlumnos.find(row => limpiar(row[0]) === matriculaInput);
-
-                if (filaAlumno) {
+                if (fila) {
                     const esPrepa = nivel.toLowerCase().includes('preparatoria');
-                    const anchoMateria = esPrepa ? 3 : 4;
+                    const jump = esPrepa ? 3 : 4;
+                    const fmt = (v) => (v && !isNaN(v)) ? (Math.floor(parseFloat(v) * 10) / 10).toFixed(1) : '-';
 
-                    const fmt = (val) => {
-                        if (!val || val === '-' || isNaN(val)) return null;
-                        // Formato a 1 decimal sin redondear hacia arriba (7.6)
-                        return (Math.floor(parseFloat(val) * 10) / 10).toFixed(1);
+                    let alumno = {
+                        Nombre: fila[1], Matricula: fila[0], Ciclo: fila[2],
+                        Grado: fila[3], Grupo: fila[4], Nivel: nivel, Materias: []
                     };
 
-                    alumnoEncontrado = {
-                        Nombre: filaAlumno[1] || '---',
-                        Matricula: filaAlumno[0],
-                        Ciclo: filaAlumno[2] || '2025-2026',
-                        Grado: filaAlumno[3] || '---',
-                        Grupo: filaAlumno[4] || '---',
-                        Materias: []
-                    };
-
-                    // PROMEDIO FINAL: Buscamos el último número de la fila antes de procesar materias
-                    let promedioFinal = "-";
-                    for (let k = filaAlumno.length - 1; k >= 5; k--) {
-                        let val = filaAlumno[k];
-                        if (val && !isNaN(val) && val.toString().trim() !== "") {
-                            promedioFinal = fmt(val);
-                            break;
-                        }
-                    }
-                    alumnoEncontrado.PromedioFinalCiclo = promedioFinal;
-
-                    // EXTRACCIÓN DE MATERIAS (Desde F = índice 5)
-                    for (let i = 5; i < filaAlumno.length - 1; i += anchoMateria) {
-                        let nombreMateria = "";
-                        // Buscar el nombre en la fila de arriba (Fila 1)
+                    // Extraer materias
+                    for (let i = 5; i < fila.length - 1; i += jump) {
+                        let nombre = "";
                         for (let j = i; j >= 5; j--) {
-                            if (filaMateriasNombres[j] && filaMateriasNombres[j].trim() !== "") {
-                                nombreMateria = filaMateriasNombres[j].trim();
-                                break;
-                            }
+                            if (headerNames[j]) { nombre = headerNames[j].trim(); break; }
                         }
-
-                        // Si detectamos que la columna es el promedio general, dejamos de añadir materias
-                        if (nombreMateria.toUpperCase().includes("PROMEDIO") || i >= filaAlumno.length - 1) break;
-
-                        // Solo añadimos la materia si tiene al menos una nota o un nombre
-                        if (nombreMateria) {
-                            if (esPrepa) {
-                                alumnoEncontrado.Materias.push({
-                                    nombre: nombreMateria,
-                                    n1: fmt(filaAlumno[i]) || '-',
-                                    n2: fmt(filaAlumno[i+1]) || '-',
-                                    nf: fmt(filaAlumno[i+2]) || '-'
-                                });
-                            } else {
-                                alumnoEncontrado.Materias.push({
-                                    nombre: nombreMateria,
-                                    n1: fmt(filaAlumno[i]) || '-',
-                                    n2: fmt(filaAlumno[i+1]) || '-',
-                                    n3: fmt(filaAlumno[i+2]) || '-',
-                                    nf: fmt(filaAlumno[i+3]) || '-'
-                                });
-                            }
-                        }
+                        if (nombre.toUpperCase().includes("PROMEDIO") || i >= fila.length - 1) break;
+                        
+                        alumno.Materias.push({
+                            n: nombre,
+                            v1: fmt(fila[i]), v2: fmt(fila[i+1]),
+                            v3: esPrepa ? null : fmt(fila[i+2]),
+                            vf: esPrepa ? fmt(fila[i+2]) : fmt(fila[i+3])
+                        });
                     }
 
-                    nivelEncontrado = nivel;
-                    break; 
+                    // Buscar promedio final
+                    for (let k = fila.length - 1; k >= 5; k--) {
+                        if (fila[k] && !isNaN(fila[k])) { alumno.Promedio = fmt(fila[k]); break; }
+                    }
+                    return alumno;
                 }
-            } catch (e) { console.error("Error procesando materias:", e); }
+            } catch (e) { console.error("Error en nivel " + nivel, e); }
         }
-
-        if (alumnoEncontrado) {
-            status.innerHTML = "<span class='text-success'>¡Boleta generada!</span>";
-            renderBoleta(alumnoEncontrado, nivelEncontrado);
-        } else {
-            status.innerHTML = `<span class='text-danger'>Matrícula '${matriculaInput}' no encontrada.</span>`;
-            document.getElementById('reportCard').style.display = 'none';
-        }
+        return null;
     }
 
-    function renderBoleta(alumno, nivel) {
-        document.getElementById('reportCard').style.display = 'block';
-        document.getElementById('displayName').innerText = alumno.Nombre;
-        document.getElementById('displayMatricula').innerText = alumno.Matricula;
-        document.getElementById('displayGradoGrupo').innerText = `${alumno.Grado} ${alumno.Grupo}`;
-        document.getElementById('displayNivel').innerText = `Boleta Oficial - ${nivel}`;
-        document.getElementById('displayCiclo').innerHTML = `<strong>Ciclo:</strong> ${alumno.Ciclo}`;
+    function renderBoleta(alumno, sufijo) {
+        document.getElementById(`reportCard${sufijo}`).style.display = 'block';
+        document.getElementById(`displayName${sufijo}`).innerText = alumno.Nombre;
+        document.getElementById(`displayMatricula${sufijo}`).innerText = alumno.Matricula;
+        document.getElementById(`displayGradoGrupo${sufijo}`).innerText = `${alumno.Grado} ${alumno.Grupo}`;
+        document.getElementById(`displayCiclo${sufijo}`).innerText = alumno.Ciclo;
+        document.getElementById(`displayNivel${sufijo}`).innerText = alumno.Nivel;
+        document.getElementById(`displayPromedio${sufijo}`).innerText = alumno.Promedio;
 
-        const esPrepa = nivel.toLowerCase().includes('preparatoria');
-        let hHead = `<tr><th style="text-align:left; width:40%;">Materia / Asignatura</th>`;
-        hHead += esPrepa ? `<th>Semestre 1</th><th>Semestre 2</th>` : `<th>Trimestre 1</th><th>Trimestre 2</th><th>Trimestre 3</th>`;
+        const esPrepa = alumno.Nivel.toLowerCase().includes('preparatoria');
+        let hHead = `<tr><th style="text-align:left;">Asignatura</th>`;
+        hHead += esPrepa ? `<th>Sem 1</th><th>Sem 2</th>` : `<th>Trim 1</th><th>Trim 2</th><th>Trim 3</th>`;
         hHead += `<th>Final</th></tr>`;
-        document.getElementById('tableHeader').innerHTML = hHead;
+        document.getElementById(`tableHeader${sufijo}`).innerHTML = hHead;
 
         let hBody = "";
         alumno.Materias.forEach(m => {
-            hBody += `<tr><td style="text-align:left; font-weight:600;">${m.nombre}</td>`;
-            hBody += `<td>${m.n1}</td><td>${m.n2}</td>`;
-            if (!esPrepa) hBody += `<td>${m.n3}</td>`;
-            hBody += `<td style="font-weight:bold; background:#f9f9f9; color:#193E9A;">${m.nf}</td></tr>`;
+            hBody += `<tr><td style="text-align:left; font-weight:600;">${m.n}</td>`;
+            hBody += `<td>${m.v1}</td><td>${m.v2}</td>`;
+            if (!esPrepa) hBody += `<td>${m.v3}</td>`;
+            hBody += `<td style="font-weight:bold; background:#f9f9f9;">${m.vf}</td></tr>`;
         });
-
-        document.getElementById('gradeRows').innerHTML = hBody || "<tr><td colspan='5'>No se encontraron datos de materias.</td></tr>";
-        document.getElementById('displayPromedio').innerText = alumno.PromedioFinalCiclo;
-        document.getElementById('promedioLabel').colSpan = esPrepa ? 3 : 4;
+        document.getElementById(`gradeRows${sufijo}`).innerHTML = hBody;
+        document.getElementById(`labelPromedio${sufijo}`).colSpan = esPrepa ? 3 : 4;
     }
 </script>
 </body>
