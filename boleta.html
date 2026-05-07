@@ -7,15 +7,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
-        :root { 
-            --azul-id: #193E9A; 
-            --verde-id: #317F77; 
-        }
-
-        /* --- NAVBAR ESTILO EXACTO A LA FOTO --- */
-        .navbar {
-            padding: 15px 0 0 0; /* Sin espacio abajo para que pegue con la línea */
-            background: white;
+        /* --- ESTILOS DE NAV EXTRAÍDOS DE RECURSOS.HTML --- */
+        :root {
+            --azul-id: #193E9A;
+            --verde-id: #317F77;
         }
         
         .navbar-brand {
@@ -23,82 +18,71 @@
             margin: 0;
             display: flex;
             align-items: center;
+            font-weight: 800;
+            color: var(--azul-id) !important;
+            font-size: 1.5rem;
         }
 
-        .logo-completo {
-            height: 60px; /* Ajustado para que el texto del logo se vea claro */
+        .logo-navbar {
+            height: 55px;
             width: auto;
+            margin-right: 10px;
         }
 
         .btn-volver {
             border: 2px solid var(--azul-id);
             color: var(--azul-id);
             font-weight: 700;
-            border-radius: 12px;
-            padding: 5px 25px;
-            text-decoration: none !important;
+            border-radius: 10px;
+            padding: 5px 20px;
             transition: 0.3s;
+            text-decoration: none !important;
+            display: inline-block;
         }
         .btn-volver:hover { background: var(--azul-id); color: white !important; }
 
-        /* LÍNEA DE DEGRADADO DEBAJO DEL NAV (IGUAL A LA IMAGEN) */
         .nav-gradient-line {
             height: 8px;
             background: linear-gradient(135deg, #193E9A 0%, #317F77 100%);
             width: 100%;
-            margin-top: 10px;
+            margin-top: 12px;
         }
 
-        /* --- HERO --- */
+        /* --- RESTO DE ESTILOS DE LA BOLETA --- */
         .hero {
             background: linear-gradient(135deg, #193E9A 0%, #317F77 100%);
-            padding: 50px 0;
+            padding: 60px 0;
             text-align: center;
             color: white;
         }
         .hero h1 { font-weight: 800; font-size: 3rem; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); }
 
-        /* --- BUSCADOR MODERNO --- */
-        .search-container { margin-top: -30px; } /* Sube un poco el buscador hacia el hero */
-        
-        .input-group { 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
-            border-radius: 30px; 
-            background: white;
-        }
-        
-        #matriculaInput {
-            border-radius: 30px 0 0 30px;
-            border: 1px solid #ddd;
-            padding-left: 25px;
-            height: 55px;
-        }
+        .instruccion { color: #555; font-weight: 500; margin-bottom: 15px; }
+        .input-group { box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-radius: 30px; }
+        #matriculaInput { border-radius: 30px 0 0 30px; border: 1px solid #ddd; padding-left: 25px; }
 
         .btn-buscar {
             background-color: var(--verde-id) !important;
             color: white !important;
             border-radius: 0 30px 30px 0 !important;
-            padding: 0 40px !important;
+            padding: 0 35px !important;
             font-weight: 800 !important;
-            font-size: 1.2rem;
             border: none !important;
         }
 
-        /* --- BOLETAS --- */
         .report-card-container {
             background: white;
-            padding: 30px;
+            padding: 35px;
             border: 1px solid #eee;
-            border-radius: 20px;
+            border-radius: 15px;
             display: none; 
-            margin-top: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
         }
 
         .page-break { page-break-before: always; }
-        .report-header { border-bottom: 3px double var(--azul-id); margin-bottom: 15px; padding-bottom: 10px; }
-        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; background: #f8fafc; padding: 15px; border-radius: 10px; }
+        .report-header { border-bottom: 3px double var(--azul-id); margin-bottom: 20px; padding-bottom: 10px; }
+        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 10px; }
         .grade-table { width: 100%; border: 2px solid #333; }
         .grade-table th, .grade-table td { border: 1px solid #333; padding: 8px; text-align: center; font-size: 0.9rem; }
         .grade-table th { background: #f4f4f4; font-weight: 700; }
@@ -107,14 +91,37 @@
             .navbar, .nav-gradient-line, .hero, .instruccion, .input-group, .btn-print-box, footer, #statusMsg { display: none !important; }
             .report-card-container { display: block !important; border: none; box-shadow: none; margin: 0; padding: 0; }
         }
+        .footer-colegio {
+            background-color: #193E9A;
+            padding: 30px 0;
+            margin-top: 50px;
+            color: white;
+        }
+
+        .link-unete {
+            color: white !important;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 8px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 25px;
+            display: inline-block;
+            transition: 0.3s;
+        }
+
+        .link-unete:hover {
+            background-color: white;
+            color: #193E9A !important;
+        }
     </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-light">
+       <nav class="navbar navbar-expand-lg sticky-top navbar-light bg-white shadow-sm">
         <div class="container d-flex justify-content-between align-items-center">
             <a class="navbar-brand" href="index.html">
-                <img src="Iconos/logo.png" class="logo-completo" alt="Colegio Niños Héroes">
+                <img src="Iconos/logo.png" style="height: 50px;"> Colegio Niños Héroes
             </a>
             <a href="index.html" class="btn-volver">← Volver</a>
         </div>
@@ -127,10 +134,10 @@
         </div>
     </div>
 
-    <div class="container search-container">
-        <div class="row justify-content-center">
-            <div class="col-md-7 text-center">
-                <p class="instruccion bg-white d-inline-block px-3 py-1 mb-3" style="border-radius: 20px; font-weight: 600;">Ingrese la matrícula para obtener ambas boletas:</p>
+    <div class="container mt-5">
+        <div class="row justify-content-center mb-5">
+            <div class="col-md-6 text-center">
+                <p class="instruccion">Ingrese la matrícula del alumno para obtener ambas boletas:</p>
                 <div class="input-group input-group-lg">
                     <input type="text" id="matriculaInput" class="form-control" placeholder="Matrícula...">
                     <div class="input-group-append">
@@ -150,7 +157,8 @@
             <div class="report-header">
                 <div class="row align-items-center">
                     <div class="col-8">
-                        <img src="Iconos/logo.png" style="max-height: 50px; margin-bottom: 5px;">
+                        <img src="Iconos/logo.png" style="max-height: 60px; margin-bottom: 5px;">
+                        <h2 style="color: var(--azul-id); font-weight: 900; margin: 0;">Colegio Niños Héroes</h2>
                         <p class="text-muted m-0"><strong id="displayNivelExtra">---</strong> | Extracurriculares</p>
                     </div>
                     <div class="col-4 text-right">
@@ -162,6 +170,7 @@
                 <div><strong>Alumno:</strong> <span id="displayNameExtra">---</span></div>
                 <div><strong>Matrícula:</strong> <span id="displayMatriculaExtra">---</span></div>
                 <div><strong>Grado y Grupo:</strong> <span id="displayGradoGrupoExtra">---</span></div>
+                <div><strong>Estatus:</strong> Alumno Regular</div>
             </div>
             <table class="grade-table">
                 <thead id="tableHeaderExtra"></thead>
@@ -179,7 +188,8 @@
             <div class="report-header">
                 <div class="row align-items-center">
                     <div class="col-8">
-                        <img src="Iconos/logo.png" style="max-height: 50px; margin-bottom: 5px;">
+                        <img src="Iconos/logo.png" style="max-height: 60px; margin-bottom: 5px;">
+                        <h2 style="color: var(--azul-id); font-weight: 900; margin: 0;">Colegio Niños Héroes</h2>
                         <p class="text-muted m-0"><strong id="displayNivelIngles">---</strong> | English Department</p>
                     </div>
                     <div class="col-4 text-right">
@@ -191,6 +201,7 @@
                 <div><strong>Student:</strong> <span id="displayNameIngles">---</span></div>
                 <div><strong>ID:</strong> <span id="displayMatriculaIngles">---</span></div>
                 <div><strong>Grade:</strong> <span id="displayGradoGrupoIngles">---</span></div>
+                <div><strong>Status:</strong> Regular Student</div>
             </div>
             <table class="grade-table">
                 <thead id="tableHeaderIngles"></thead>
@@ -204,6 +215,21 @@
             </table>
         </div>
     </div>
+
+    <footer class="footer-colegio">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8 text-center text-md-left mb-3 mb-md-0">
+                    <p class="mb-0 text-white">© 2026 <strong>Colegio Niños Héroes Atizapán</strong>. Todos los derechos
+                        reservados.</p>
+                </div>
+                <div class="col-md-4 text-center text-md-right">
+                    <a href="bolsa-trabajo.html" class="link-unete"><i class="fas fa-briefcase mr-2"></i>Únete a nuestro
+                        equipo</a>
+                </div>
+            </div>
+        </div>
+    </footer>
 
 <script>
     const idExtra = '12m7RYtCBAF-P6t8_hoS3TkJwVX0tHEf7uaHAs6m0pTs';
@@ -219,24 +245,22 @@
     async function buscarBoletas() {
         const matricula = document.getElementById('matriculaInput').value.trim().toUpperCase();
         const status = document.getElementById('statusMsg');
-        
         if (!matricula) {
             status.innerHTML = "<span class='text-warning'>Ingrese una matrícula válida.</span>";
             return;
         }
-
-        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Buscando...";
-        
+        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Buscando información...";
         const [dataExtra, dataIngles] = await Promise.all([
             obtenerDatos(idExtra, matricula),
             obtenerDatos(idIngles, matricula)
         ]);
-
         if (dataExtra || dataIngles) {
-            status.innerHTML = "";
+            status.innerHTML = "<span class='text-success'>¡Datos encontrados!</span>";
             document.getElementById('printBtnContainer').style.display = 'block';
             if (dataExtra) renderBoleta(dataExtra, 'Extra');
+            else document.getElementById('reportCardExtra').style.display = 'none';
             if (dataIngles) renderBoleta(dataIngles, 'Ingles');
+            else document.getElementById('reportCardIngles').style.display = 'none';
         } else {
             status.innerHTML = "<span class='text-danger'>Matrícula no encontrada.</span>";
             document.getElementById('reportCardExtra').style.display = 'none';

@@ -92,6 +92,30 @@
             position: relative;
             padding-bottom: 10px;
         }
+        
+        .footer-colegio {
+            background-color: #193E9A;
+            padding: 30px 0;
+            margin-top: 50px;
+            color: white;
+        }
+
+        .link-unete {
+            color: white !important;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 8px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 25px;
+            display: inline-block;
+            transition: 0.3s;
+        }
+
+        .link-unete:hover {
+            background-color: white;
+            color: #193E9A !important;
+        }
     </style>
 </head>
 <body>
@@ -162,9 +186,18 @@
         </div>
     </section>
 
-    <footer style="background: var(--azul-id); color: white; padding: 25px 0; text-align: center; margin-top: 50px;">
+    <footer class="footer-colegio">
         <div class="container">
-            <p class="mb-0 small">© 2026 Colegio Niños Héroes Atizapán. Todos los derechos reservados.</p>
+            <div class="row align-items-center">
+                <div class="col-md-8 text-center text-md-left mb-3 mb-md-0">
+                    <p class="mb-0 text-white">© 2026 <strong>Colegio Niños Héroes Atizapán</strong>. Todos los derechos
+                        reservados.</p>
+                </div>
+                <div class="col-md-4 text-center text-md-right">
+                    <a href="bolsa-trabajo.html" class="link-unete"><i class="fas fa-briefcase mr-2"></i>Únete a nuestro
+                        equipo</a>
+                </div>
+            </div>
         </div>
     </footer>
 
