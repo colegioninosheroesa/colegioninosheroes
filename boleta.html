@@ -85,7 +85,7 @@
     const idExtra = '12m7RYtCBAF-P6t8_hoS3TkJwVX0tHEf7uaHAs6m0pTs';
     const idIngles = '1EY955TiJLZtpffxAtNQW3bjVuw8vHfYm_JYhX_6hXd4';
     
-    // Formato exacto de las pestañas en tu Google Sheets
+    // Nombres exactos de las pestañas en tus archivos
     const niveles = [
         'Maternal', 'Kinder 1', 'Kinder 2', 'Kinder 3', 
         'Primaria 1', 'Primaria 2', 'Primaria 3', 'Primaria 4', 'Primaria 5', 'Primaria 6',
@@ -93,7 +93,7 @@
         'Preparatoria 1', 'Preparatoria 2', 'Preparatoria 3'
     ];
 
-    // Materias en MAYÚSCULAS para coincidir con tu Excel
+    // Mapeo de materias en MAYÚSCULAS (según Excel) y por nivel
     const MATERIAS_MAP = {
         ingles: (n) => {
             const nl = n.toUpperCase();
@@ -112,6 +112,7 @@
         }
     };
 
+    // Función de truncado a 1 decimal (8.79 -> 8.7)
     const fmt = (v) => {
         if (v === undefined || v === null || v === "" || isNaN(v)) return '-';
         return (Math.floor(parseFloat(v) * 10) / 10).toFixed(1);
@@ -120,11 +121,10 @@
     async function buscarBoletas() {
         const mat = document.getElementById('matriculaInput').value.trim().toUpperCase();
         const status = document.getElementById('statusMsg');
-        if (!mat) { status.innerText = "Ingrese matrícula."; return; }
+        if (!mat) { status.innerText = "Ingrese una matrícula."; return; }
 
         status.innerHTML = "<i class='fas fa-sync fa-spin'></i> Buscando información...";
         
-        // Ejecutamos ambas búsquedas al mismo tiempo
         const [dEx, dIn] = await Promise.all([
             obtenerDatos(idExtra, mat, 'extra'),
             obtenerDatos(idIngles, mat, 'ingles')
@@ -135,63 +135,59 @@
             document.getElementById('printBtnContainer').style.display = 'block';
             if (dEx) renderBoleta(dEx, 'Extra', 'ASIGNATURAS EXTRACURRICULARES');
             else document.getElementById('reportCardExtra').style.display = 'none';
-            if (dIn) renderBoleta(dIn, 'Ingles', 'ENGLISH DEPARTMENT REPORT');
+            if (dIn) renderBoleta(dIn, 'Ingles', 'BOLETA DE INGLÉS');
             else document.getElementById('reportCardIngles').style.display = 'none';
         } else {
-            status.innerHTML = "<span class='text-danger'>Matrícula no encontrada. Verifique que el alumno esté en el archivo.</span>";
+            status.innerHTML = "<span class='text-danger'>Matrícula no encontrada.</span>";
             document.getElementById('printBtnContainer').style.display = 'none';
         }
     }
 
     async function obtenerDatos(sheetId, mat, tipo) {
         for (let nivel of niveles) {
-            // Se usa el nombre del nivel exacto (Maternal, Kinder 1...) para la URL
             const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(nivel)}&tqx=cb:${Date.now()}`;
-            
             try {
                 const res = await fetch(url);
                 const csv = await res.text();
                 const data = Papa.parse(csv, {header: false, skipEmptyLines: true}).data;
                 
-                // Buscamos la fila donde dice "Matricula" (normalmente fila 2)
+                // Encontrar fila de 'Matricula' (Fila 2)
                 const hIdx = data.findIndex(r => r.some(c => c && c.toString().toUpperCase().includes('MATRICULA')));
                 if (hIdx === -1) continue;
 
-                // Buscamos al alumno por su matrícula en la primera columna
+                // Encontrar fila del alumno
                 const studentRow = data.find(r => r[0] && r[0].toString().trim().toUpperCase() === mat);
 
                 if (studentRow) {
-                    // Los nombres de materias están UN FILA ARRIBA de donde dice "Matricula"
-                    const headers = data[hIdx - 1] || []; 
+                    const headersRow = data[hIdx - 1] || []; // Nombres de materias (Fila 1)
                     const esPrepa = nivel.toUpperCase().includes('PREPARATORIA');
-                    const jump = esPrepa ? 3 : 4;
+                    const jump = esPrepa ? 3 : 4; 
                     const filtro = MATERIAS_MAP[tipo](nivel);
                     let listaMaterias = [];
                     
-                    // Empezamos en columna F (índice 5) que es donde suelen iniciar las notas
-                    for (let i = 5; i < studentRow.length; i++) {
-                        let nombreMateria = "";
-                        // Lógica para celdas combinadas: si la celda actual está vacía en el header, busca a la izquierda
+                    // Empezamos en columna F (índice 5)
+                    for (let i = 5; i < studentRow.length; i += jump) {
+                        let nombreM = "";
+                        // Buscar el nombre de la materia hacia la izquierda (celdas combinadas)
                         for (let j = i; j >= 5; j--) {
-                            if (headers[j] && headers[j].trim() !== "") {
-                                nombreMateria = headers[j].trim().toUpperCase();
+                            if (headersRow[j] && headersRow[j].trim() !== "") {
+                                nombreM = headersRow[j].trim().toUpperCase();
                                 break;
                             }
                         }
 
-                        if (nombreMateria && filtro.includes(nombreMateria)) {
+                        if (nombreM && filtro.includes(nombreM)) {
                             listaMaterias.push({
-                                n: nombreMateria,
+                                n: nombreM,
                                 v1: fmt(studentRow[i]),
                                 v2: fmt(studentRow[i+1]),
                                 v3: esPrepa ? null : fmt(studentRow[i+2]),
                                 vf: esPrepa ? fmt(studentRow[i+2]) : fmt(studentRow[i+3])
                             });
-                            i += (jump - 1); // Saltamos las columnas de los trimestres/semestres
                         }
                     }
 
-                    // Promedio Final: buscamos el último número en la fila del alumno
+                    // Promedio Final: Último valor numérico de la fila
                     let pf = "-";
                     for (let k = studentRow.length - 1; k >= 5; k--) {
                         if (studentRow[k] && !isNaN(studentRow[k]) && studentRow[k].toString().trim() !== "") {
@@ -200,21 +196,9 @@
                         }
                     }
 
-                    return { 
-                        nombre: studentRow[1], 
-                        mat: studentRow[0], 
-                        ciclo: studentRow[2], 
-                        grado: studentRow[3], 
-                        grupo: studentRow[4], 
-                        nivel, 
-                        materias: listaMaterias, 
-                        pf, 
-                        esPrepa 
-                    };
+                    return { nombre: studentRow[1], mat: studentRow[0], ciclo: studentRow[2], grado: studentRow[3], grupo: studentRow[4], nivel, materias: listaMaterias, pf, esPrepa };
                 }
-            } catch (e) { 
-                console.error("Error leyendo nivel: " + nivel, e); 
-            }
+            } catch (e) { console.error(e); }
         }
         return null;
     }
@@ -235,16 +219,16 @@
             <div class="info-section">
                 <div class="row">
                     <div class="col-7"><b>ALUMNO:</b> ${d.nombre}</div>
-                    <div class="col-5"><b>GRADO:</b> ${d.grado} ${d.grupo}</div>
+                    <div class="col-5"><b>GRADO Y GRUPO:</b> ${d.grado} ${d.grupo}</div>
                     <div class="col-7"><b>MATRÍCULA:</b> ${d.mat}</div>
-                    <div class="col-5"><b>NIVEL:</b> ${d.nivel}</div>
+                    <div class="col-5"><b>CICLO:</b> ${d.ciclo}</div>
                 </div>
             </div>
             <table class="grade-table">
                 <thead>
                     <tr>
                         <th style="text-align:left; padding-left:15px;">MATERIAS</th>
-                        ${d.esPrepa ? '<th>SEM 1</th><th>SEM 2</th>' : '<th>1er TRIM</th><th>2do TRIM</th><th>3er TRIM</th>'}
+                        ${d.esPrepa ? '<th>1er SEM</th><th>2do SEM</th>' : '<th>1er TRIM</th><th>2do TRIM</th><th>3er TRIM</th>'}
                         <th>FINAL</th>
                     </tr>
                 </thead>
