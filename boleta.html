@@ -131,7 +131,7 @@
             status.innerHTML = "<span class='text-success'>¡Información cargada!</span>";
             document.getElementById('printBtnContainer').style.display = 'block';
             if (dEx) renderBoleta(dEx, 'Extra', 'ASIGNATURAS EXTRACURRICULARES');
-            if (dIn) renderBoleta(dIn, 'Ingles', 'BOLETA DE INGLÉS'); // Título en español
+            if (dIn) renderBoleta(dIn, 'Ingles', 'BOLETA DE INGLÉS');
         } else {
             status.innerHTML = "<span class='text-danger'>Matrícula no encontrada. Verifique los archivos de origen.</span>";
             document.getElementById('printBtnContainer').style.display = 'none';
@@ -146,15 +146,16 @@
                 const csv = await res.text();
                 const data = Papa.parse(csv, {header: false, skipEmptyLines: true}).data;
                 
-                // Buscar fila de encabezados (donde está "Matricula")
+                // Buscar fila de encabezados secundarios (donde está "Matricula", usualmente fila 2 -> índice 1)
                 const hIdx = data.findIndex(r => r.some(c => c && c.toString().trim().toUpperCase().includes('MATRICULA')));
                 if (hIdx === -1) continue;
 
-                const headersRow = data[hIdx - 1] || []; 
+                // En tu Excel, los nombres de las materias reales están en la Fila 1 (Índice 0)
+                const headersRow = data[0] || []; 
                 const colMatIdx = data[hIdx].findIndex(c => c && c.toString().trim().toUpperCase().includes('MATRICULA'));
                 
-                // Buscar al alumno
-                const studentRow = data.find(r => r[colMatIdx] && r[colMatIdx].toString().trim().toUpperCase() === mat);
+                // Buscar al alumno a partir de la fila 3
+                const studentRow = data.find((r, idx) => idx >= hIdx && r[colMatIdx] && r[colMatIdx].toString().trim().toUpperCase() === mat);
 
                 if (studentRow) {
                     const esPrepa = nivel.toUpperCase().includes('PREPARATORIA');
@@ -162,7 +163,7 @@
                     const filtro = MATERIAS_MAP[tipo](nivel);
                     let listaMaterias = [];
                     
-                    // Empezar búsqueda de materias desde la columna F (5)
+                    // Las materias y calificaciones inician formalmente en la columna F (Índice 5)
                     for (let i = 5; i < studentRow.length; i += jump) {
                         let nombreM = "";
                         for (let j = i; j >= 5; j--) {
@@ -183,7 +184,7 @@
                         }
                     }
 
-                    // Promedio Final (última columna con datos)
+                    // Calcular Promedio Final
                     let pf = "-";
                     for (let k = studentRow.length - 1; k >= 5; k--) {
                         if (studentRow[k] && !isNaN(studentRow[k]) && studentRow[k].toString().trim() !== "") {
@@ -195,7 +196,7 @@
                     return { 
                         nombre: studentRow[1], mat: studentRow[0], ciclo: studentRow[2], 
                         grado: studentRow[3], grupo: studentRow[4], nivel, 
-                        materias: listaMaterias, pf, esPrepa 
+                        materias: listaMaterias, pf, esPrepa, tipo
                     };
                 }
             } catch (e) { console.error(e); }
@@ -206,14 +207,17 @@
     function renderBoleta(d, idS, tit) {
         const div = document.getElementById(`reportCard${idS}`);
         div.style.display = 'block';
-        div.className = 'report-card-container'; // Aplicar clase de diseño
+        div.className = 'report-card-container';
         
+        // Determinar dinámicamente los textos de las firmas según el tipo de boleta
+        const firmaCoordinacion = d.tipo === 'ingles' ? 'COORDINACIÓN DE INGLÉS' : 'COORDINACIÓN DE MATERIAS EXTRACURRICULARES';
+
         div.innerHTML = `
             <div style="text-align: center; position: relative; margin-bottom: 20px;">
                 <img src="Iconos/logo.png" style="position: absolute; left: 0; top: 0; height: 80px;">
                 <h1 style="color: #193E9A; margin: 0; font-size: 28px; font-weight: bold;">COLEGIO NIÑOS HÉROES</h1>
                 <p style="font-size: 10px; margin: 5px 0;">DURANGO S/N AMP. ADOLFO LÓPEZ MATEOS, ATIZAPÁN DE ZARAGOZA.<br>58204881 Y 5590557078</p>
-                <h2 style="color: #317F77; border-top: 2px solid #193E9A; border-bottom: 2px solid #193E9A; padding: 5px 0; margin-top: 10px; letter-spacing: 2px;">BOLETA DE CALIFICACIONES</h2>
+                <h2 style="color: #317F77; border-top: 2px solid #193E9A; border-bottom: 2px solid #193E9A; padding: 5px 0; margin-top: 10px; letter-spacing: 2px;">${tit}</h2>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; font-size: 13px;">
@@ -233,12 +237,7 @@
                 "La educación no solo forma estudiantes, forma seres humanos capaces de soñar en grande, de levantarse ante las dificultades y de construir con esfuerzo y valores el futuro que desean alcanzar."
             </p>
 
-            <div style="display: flex; justify-content: space-around; margin-bottom: 20px;">
-                <div style="border-top: 1px solid black; width: 150px; text-align: center; font-size: 10px; padding-top: 5px;">DIRECTOR</div>
-                <div style="border-top: 1px solid black; width: 150px; text-align: center; font-size: 10px; padding-top: 5px;">DIRECTORA</div>
-            </div>
-
-            <table class="grade-table" style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+            <table class="grade-table" style="width: 100%; border-collapse: collapse; margin-bottom: 40px;">
                 <thead>
                     <tr style="background: #455a64; color: white;">
                         <th style="border: 1px solid #000; padding: 5px; text-align: left;">MATERIAS</th>
@@ -251,7 +250,7 @@
                 <tbody>
                     ${d.materias.map(m => `
                         <tr>
-                            <td style="border: 1px solid #000; padding: 5px; font-weight: bold;">${m.n}</td>
+                            <td style="border: 1px solid #000; padding: 5px; font-weight: bold; text-align: left;">${m.n}</td>
                             <td style="border: 1px solid #000; padding: 5px; text-align: center;">${m.v1}</td>
                             <td style="border: 1px solid #000; padding: 5px; text-align: center;">${m.v2}</td>
                             ${!d.esPrepa ? `<td style="border: 1px solid #000; padding: 5px; text-align: center;">${m.v3}</td>` : ''}
@@ -262,16 +261,9 @@
                 </tbody>
             </table>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; font-size: 11px;">
-                <div style="border: 1px solid #ccc; padding: 5px;">
-                    <b>Descripción</b><br>Excelente: 90-100<br>Bueno: 80-89<br>Insuficiente: 70-79<br>Por debajo del promedio: 60-69
-                </div>
-                <div style="border: 1px solid #ccc; padding: 5px;">
-                    <b>Escala de calificación</b><br>90-100<br>80-89<br>70-79<br>60-69
-                </div>
-                <div style="border: 1px solid #ccc; padding: 5px;">
-                    <b>Comentarios</b><br>Aprobado<br>Aprobado<br>Reprobado<br>Reprobado
-                </div>
+            <div style="display: flex; justify-content: space-around; margin-top: 80px; margin-bottom: 20px;">
+                <div style="border-top: 1px solid black; width: 250px; text-align: center; font-size: 11px; padding-top: 5px; font-weight: bold;">DIRECCIÓN GENERAL</div>
+                <div style="border-top: 1px solid black; width: 250px; text-align: center; font-size: 11px; padding-top: 5px; font-weight: bold;">${firmaCoordinacion}</div>
             </div>
         `;
     }
