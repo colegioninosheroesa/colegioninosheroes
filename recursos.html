@@ -259,9 +259,12 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
     <script>
-        // CONFIGURACIÓN PRINCIPAL: ID del archivo de Google Sheets y pestaña donde están las boletas/matrículas
+        // CONFIGURACIÓN PRINCIPAL
         const idExcelMatriculas = '18JCUK-SGSQCXMvWng3O3hZYxD4GU_BVILkvO_tawDZo'; 
-        const nombrePestana = 'Matriculas'; // Cambiar por el nombre de la pestaña donde estén las matrículas (ej. 'General', 'Alumnos', etc.)
+        
+        // ⚠️ REEMPLAZA EL '0' POR EL NÚMERO DE GID DE TU PESTAÑA "Matriculas"
+        // Lo encuentras en la URL de tu navegador al seleccionar esa pestaña (ej: gid=145236)
+        const gidPestana = '905049780'; 
 
         function validarYDescargar() {
             const matriculaIngresada = document.getElementById('inputMatricula').value.trim().toUpperCase();
@@ -273,8 +276,8 @@
                 return;
             }
 
-            // Construimos la URL segura de exportación para PapaParse
-            const url = `https://docs.google.com/spreadsheets/d/${idExcelMatriculas}/pub?output=csv&sheet=${encodeURIComponent(nombrePestana)}`;
+            // URL Estricta de exportación por GID que evita redirecciones forzadas de Google
+            const url = `https://docs.google.com/spreadsheets/d/${idExcelMatriculas}/export?format=csv&gid=${gidPestana}`;
 
             Papa.parse(url, {
                 download: true,
@@ -282,25 +285,25 @@
                     const datos = results.data;
                     let matriculaValida = false;
 
-                    // Recorremos todas las filas y columnas buscando coincidencias
+                    // Buscamos directamente en la Columna A (índice 0)
                     for (let i = 0; i < datos.length; i++) {
-                        for (let j = 0; j < datos[i].length; j++) {
-                            if (datos[i][j] && datos[i][j].toString().trim().toUpperCase() === matriculaIngresada) {
+                        if (datos[i][0]) { 
+                            const valorCelda = datos[i][0].toString().trim().toUpperCase();
+                            if (valorCelda === matriculaIngresada) {
                                 matriculaValida = true;
                                 break;
                             }
                         }
-                        if (matriculaValida) break;
                     }
 
                     if (matriculaValida) {
                         errorElemento.style.display = "none";
                         $('#modalMatricula').modal('hide'); // Ocultar cuadro
-                        document.getElementById('inputMatricula').value = ""; // Limpiar input
+                        document.getElementById('inputMatricula').value = ""; // Limpiar el campo
                         
                         // Forzamos la descarga automática del archivo real
                         const linkDescarga = document.createElement('a');
-                        linkDescarga.href = 'Adjuntos/examenes.pdf'; // Tu archivo
+                        linkDescarga.href = 'Adjuntos/examenes.pdf'; 
                         linkDescarga.download = 'Cronograma_Evaluaciones.pdf';
                         document.body.appendChild(linkDescarga);
                         linkDescarga.click();
@@ -310,8 +313,9 @@
                         errorElemento.style.display = "block";
                     }
                 },
-                error: function() {
-                    errorElemento.innerText = "Error de conexión con la base de datos. Intente más tarde.";
+                error: function(err) {
+                    console.error("Error PapaParse:", err);
+                    errorElemento.innerText = "Error de acceso a los datos de verificación.";
                     errorElemento.style.display = "block";
                 }
             });
