@@ -23,67 +23,93 @@
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         }
 
-        /* --- ESTILOS DE NIVELES (NUEVO DISEÑO) --- */
+        /* --- ESTILOS DE NIVELES ACADÉMICOS --- */
         .card-nivel {
             border: none;
             border-radius: 20px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-            padding-top: 25px;
-            background: #fff;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            padding: 30px 15px;
             height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
         }
 
+        /* Colores con mayor intensidad (Estilo Muestra) */
+        .pastel-rosa { background-color: #FFB7CE !important; }
+        .pastel-verde { background-color: #C1E7C4 !important; }
+        .pastel-azul { background-color: #B3E5FC !important; }
+        .pastel-lila { background-color: #E1BEE7 !important; }
+
         .card-nivel:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 35px rgba(25, 62, 154, 0.1);
+            transform: translateY(-12px);
+            box-shadow: 0 20px 35px rgba(25, 62, 154, 0.2);
         }
 
         .nivel-icon-box {
-            width: 70px;
-            height: 70px;
-            background: #f0f7f6;
-            color: #317F77;
+            width: 85px;
+            height: 85px;
+            background: rgba(255, 255, 255, 0.9);
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            margin: 0 auto 15px;
-            font-size: 1.8rem;
+            margin: 0 auto 20px;
+            font-size: 2.2rem;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.06);
+            transition: all 0.4s ease;
         }
+
+        /* Colores realistas Niveles */
+        .icon-preescolar { color: #E91E63; }
+        .icon-primaria { color: #FF5722; }
+        .icon-secundaria { color: #2196F3; }
+        .icon-preparatoria { color: #3F51B5; }
 
         .card-nivel h5 {
             color: #193E9A;
             font-weight: 800;
             text-transform: uppercase;
-            font-size: 1.1rem;
+            font-size: 1.25rem;
             text-align: center;
-        }
-
-        .divider-sm {
-            width: 40px;
-            height: 3px;
-            background: #317F77;
-            margin: 10px auto;
-            border-radius: 2px;
-        }
-
-        /* --- SOLUCIÓN TEXTO JUSTIFICADO COMPACTO --- */
-        .card-nivel p {
-            font-size: 0.92rem;
-            color: #555;
-            line-height: 1.5;
-            text-align: justify;
-            text-justify: inter-word;
-            /* Distribución natural de espacios */
-            hyphens: auto;
-            /* Corta palabras largas */
-            -webkit-hyphens: auto;
-            padding: 0 15px 15px;
+            letter-spacing: 0.5px;
             margin-bottom: 0;
         }
 
-        /* --- ESTILOS ORIGINALES PARA TARJETAS EXTRAS --- */
+        .divider-sm {
+            width: 45px;
+            height: 3px;
+            background: #193E9A;
+            margin: 12px auto;
+            border-radius: 2px;
+            opacity: 0.7;
+        }
+
+        .btn-ver-nivel {
+            background-color: #193E9A;
+            color: white !important;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            padding: 9px 22px;
+            border-radius: 50px;
+            text-decoration: none !important;
+            transition: all 0.3s ease;
+            display: inline-block;
+            box-shadow: 0 4px 10px rgba(25, 62, 154, 0.2);
+        }
+
+        .btn-ver-nivel:hover {
+            background-color: #ffffff;
+            color: #193E9A !important;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- ESTILOS TARJETAS SECUNDARIAS (EXTRAS, AFTER SCHOOL, REGULARIZACIONES) --- */
         .card-link {
             text-decoration: none !important;
             display: block;
@@ -112,23 +138,25 @@
         .card-extra {
             border: none;
             border-radius: 15px;
-            transition: 0.3s;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             background: #fff;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
             margin-bottom: 20px;
             cursor: pointer;
+            text-align: center;
         }
 
         .card-link:hover .card-extra {
             transform: translateY(-8px);
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
-            background-color: #f8fbff;
+            background-color: #fcfdfe;
         }
 
         .card-extra i {
-            color: #317F77;
-            font-size: 1.8rem;
-            margin-bottom: 12px;
+            font-size: 2.1rem;
+            margin-bottom: 14px;
+            transition: all 0.4s ease-in-out;
+            display: inline-block;
         }
 
         .card-extra h6 {
@@ -138,6 +166,97 @@
             font-size: 0.95rem;
         }
 
+        /* --- COLORES REALISTAS INDIVIDUALES PARA CADA ICONO --- */
+        .real-musica { color: #D4AF37 !important; }        /* Dorado latón/instrumento */
+        .real-mate { color: #009688; }                  /* Verde pizarrón / calculadora */
+        .real-digital { color: #5A5A5A !important; }       /* Gris aluminio de laptop */
+        .real-robotica { color: #4682B4 !important; }      /* Azul metalizado / acero */
+        .real-ajedrez { color: #A0522D !important; }       /* Café madera de tablero */
+        .real-tkd { color: #D32F2F !important; }           /* Rojo vivo marcial */
+        .real-danza { color: #FF69B4 !important; }         /* Rosa zapatilla de ballet */
+        .real-tocho { color: #8B4513 !important; }         /* Café cuero de balón americano */
+        
+        .real-italiano { color: #2E7D32 !important; }      /* Verde de la bandera de Italia */
+        .real-pintura { color: #FF9800 !important; }       /* Óleo naranja de paleta artística */
+        .real-manualidades { color: #9C27B0 !important; }  /* Morado creativo / diamantina */
+        .real-juegos { color: #FFEB3B !important; text-shadow: 1px 1px 1px rgba(0,0,0,0.1); } /* Amarillo rompecabezas */
+        .real-tareas { color: #0D47A1 !important; }        /* Azul pluma de tinta escolar */
+        .real-futbol { color: #333333 !important; }        /* Negro/Blanco clásico de balón */
+        .real-hawaiano { color: #4CAF50 !important; }      /* Verde naturaleza / hoja de palma */
+        .real-voleibol { color: #FFC107 !important; }      /* Amarillo clásico de balón de voley */
+        .real-porristas { color: #E91E63 !important; }     /* Rosa pompones vibrantes */
+        .real-basquet { color: #E65100 !important; }       /* Naranja característico de balón de basket */
+        
+        .real-ingles { color: #3F51B5 !important; }        /* Azul marino global/mapamundi */
+        .real-espanol { color: #A0522D !important; }       /* Café pastas de libro impreso */
+
+        /* --- TRANSICIONES Y EFECTOS DE MOVIMIENTO EN HOVER --- */
+        
+        /* Efecto de balanceo/pincel o música */
+        .card-link:hover .icon-preescolar, 
+        .card-link:hover .real-musica,
+        .card-link:hover .real-pintura { 
+            animation: swingEffect 0.6s ease-in-out infinite alternate; 
+        }
+        /* Efecto cohete o elevación */
+        .card-link:hover .icon-primaria, 
+        .card-link:hover .real-robotica, 
+        .card-link:hover .real-danza { 
+            animation: floatEffect 0.5s ease-in-out infinite alternate; 
+        }
+        /* Efecto pulso / comunidad / crecer */
+        .card-link:hover .icon-secundaria, 
+        .card-link:hover .real-mate,
+        .card-link:hover .real-manualidades,
+        .card-link:hover .real-juegos { 
+            animation: pulseEffect 0.6s ease-in-out infinite alternate; 
+        }
+        /* Efecto rotación de logro / deportes / acción */
+        .card-link:hover .icon-preparatoria, 
+        .card-link:hover .real-ajedrez,
+        .card-link:hover .real-tkd,
+        .card-link:hover .real-tocho,
+        .card-link:hover .real-futbol,
+        .card-link:hover .real-voleibol,
+        .card-link:hover .real-basquet { 
+            animation: spinEffect 0.5s ease-in-out; 
+        }
+        /* Efecto guiño / sutil deslizamiento lateral */
+        .card-link:hover .real-digital,
+        .card-link:hover .real-italiano,
+        .card-link:hover .real-tareas,
+        .card-link:hover .real-hawaiano,
+        .card-link:hover .real-porristas,
+        .card-link:hover .real-ingles,
+        .card-link:hover .real-espanol { 
+            animation: slideEffect 0.4s ease-in-out; 
+        }
+
+        /* Keyframes de Animaciones */
+        @keyframes swingEffect {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(20deg); }
+        }
+        @keyframes floatEffect {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-6px); }
+        }
+        @keyframes pulseEffect {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.18); }
+        }
+        @keyframes spinEffect {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(-15deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+        @keyframes slideEffect {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(5px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* --- BOTÓN WHATSAPP Y FOOTER --- */
         .footer-colegio {
             background-color: #193E9A;
             padding: 30px 0;
@@ -162,10 +281,8 @@
             color: #193E9A !important;
         }
 
-        /* Botón de WhatsApp Estilo Limpio (Igual a Oferta Educativa) */
         .btn-whatsapp-nav {
             background-color: #38b44a !important;
-            /* El verde exacto de la imagen */
             border-color: #38b44a !important;
             color: white !important;
             font-weight: 700 !important;
@@ -182,8 +299,6 @@
         .btn-whatsapp-nav:hover {
             background-color: #2e963d !important;
             text-decoration: none !important;
-            transform: none;
-            /* Quitamos el salto para que sea serio */
         }
 
         .btn-whatsapp-nav i {
@@ -196,8 +311,7 @@
 <body>
     <div class="top-bar d-none d-md-block">
         <div class="container d-flex justify-content-between align-items-center">
-            <div><i class="fas fa-envelope mr-1"></i> cnh.admi@hotmail.com | 55 5820 4881 - 55 9055 7078
-</div>
+            <div><i class="fas fa-envelope mr-1"></i> cnh.admi@hotmail.com | 55 5820 4881 - 55 9055 7078</div>
             <div><a href="#" style="color:white"><i class="fab fa-facebook-f"></i></a></div>
         </div>
     </div>
@@ -232,83 +346,100 @@
     <section class="container text-center mb-5">
         <h2 class="section-title">Niveles Académicos</h2>
         <div class="row">
+            
             <div class="col-md-3 mb-4">
-                <div class="card card-nivel">
-                    <div class="nivel-icon-box"><i class="fas fa-paint-brush"></i></div>
-                    <h5>Preescolar</h5>
-                    <div class="divider-sm"></div>
-                    <p>No es solo jugar; es descubrir el mundo. Convertimos cada pregunta en una aventura bilingüe,
-                        sembrando confianza en un entorno seguro.</p>
+                <div class="card card-nivel pastel-rosa">
+                    <div>
+                        <div class="nivel-icon-box"><i class="fas fa-paint-brush icon-preescolar"></i></div>
+                        <h5>Preescolar</h5>
+                        <div class="divider-sm"></div>
+                    </div>
+                    <div class="mt-2">
+                        <a href="preescolar.html" class="btn-ver-nivel">Ver Nivel</a>
+                    </div>
                 </div>
             </div>
+
             <div class="col-md-3 mb-4">
-                <div class="card card-nivel">
-                    <div class="nivel-icon-box"><i class="fas fa-rocket"></i></div>
-                    <h5>Primaria</h5>
-                    <div class="divider-sm"></div>
-                    <p>¡Energía y aprendizaje activo! A través del deporte y la tecnología, formamos mentes curiosas con
-                        valores de respeto y disciplina.</p>
+                <div class="card card-nivel pastel-verde">
+                    <div>
+                        <div class="nivel-icon-box"><i class="fas fa-rocket icon-primaria"></i></div>
+                        <h5>Primaria</h5>
+                        <div class="divider-sm"></div>
+                    </div>
+                    <div class="mt-2">
+                        <a href="primaria.html" class="btn-ver-nivel">Ver Nivel</a>
+                    </div>
                 </div>
             </div>
+
             <div class="col-md-3 mb-4">
-                <div class="card card-nivel">
-                    <div class="nivel-icon-box"><i class="fas fa-users"></i></div>
-                    <h5>Secundaria</h5>
-                    <div class="divider-sm"></div>
-                    <p>El momento de encontrar tu propia voz. Impulsamos el pensamiento crítico para superar retos y
-                        construir las bases de tu futuro.</p>
+                <div class="card card-nivel pastel-azul">
+                    <div>
+                        <div class="nivel-icon-box"><i class="fas fa-users icon-secundaria"></i></div>
+                        <h5>Secundaria</h5>
+                        <div class="divider-sm"></div>
+                    </div>
+                    <div class="mt-2">
+                        <a href="secundaria.html" class="btn-ver-nivel">Ver Nivel</a>
+                    </div>
                 </div>
             </div>
+
             <div class="col-md-3 mb-4">
-                <div class="card card-nivel">
-                    <div class="nivel-icon-box"><i class="fas fa-graduation-cap"></i></div>
-                    <h5>Preparatoria</h5>
-                    <div class="divider-sm"></div>
-                    <p>Tu plataforma de lanzamiento. Liderazgo e investigación para transformar tu entorno y conquistar
-                        tus metas universitarias.</p>
+                <div class="card card-nivel pastel-lila">
+                    <div>
+                        <div class="nivel-icon-box"><i class="fas fa-graduation-cap icon-preparatoria"></i></div>
+                        <h5>Preparatoria</h5>
+                        <div class="divider-sm"></div>
+                    </div>
+                    <div class="mt-2">
+                        <a href="preparatoria.html" class="btn-ver-nivel">Ver Nivel</a>
+                    </div>
                 </div>
             </div>
+
         </div>
 
         <h2 class="section-title">Materias Extracurriculares</h2>
         <div class="row mt-4">
             <div class="col-6 col-md-3"><a href="info-musica.html" class="card-link">
-                    <div class="card card-extra p-3"><i class="fas fa-music"></i>
+                    <div class="card card-extra p-3"><i class="fas fa-music real-musica"></i>
                         <h6>Música</h6>
                     </div>
                 </a></div>
             <div class="col-6 col-md-3"><a href="info-mate.html" class="card-link">
-                    <div class="card card-extra p-3"><i class="fas fa-calculator"></i>
+                    <div class="card card-extra p-3"><i class="fas fa-calculator real-mate"></i>
                         <h6>Matemáticas Divertidas</h6>
                     </div>
                 </a></div>
             <div class="col-6 col-md-3"><a href="info-digital.html" class="card-link">
-                    <div class="card card-extra p-3"><i class="fas fa-laptop-code"></i>
+                    <div class="card card-extra p-3"><i class="fas fa-laptop-code real-digital"></i>
                         <h6>Herramientas Digitales</h6>
                     </div>
                 </a></div>
             <div class="col-6 col-md-3"><a href="info-robotica.html" class="card-link">
-                    <div class="card card-extra p-3"><i class="fas fa-robot"></i>
+                    <div class="card card-extra p-3"><i class="fas fa-robot real-robotica"></i>
                         <h6>Robótica</h6>
                     </div>
                 </a></div>
             <div class="col-6 col-md-3"><a href="info-ajedrez.html" class="card-link">
-                    <div class="card card-extra p-3"><i class="fas fa-chess-knight"></i>
+                    <div class="card card-extra p-3"><i class="fas fa-chess-knight real-ajedrez"></i>
                         <h6>Ajedrez</h6>
                     </div>
                 </a></div>
             <div class="col-6 col-md-3"><a href="info-tkd.html" class="card-link">
-                    <div class="card card-extra p-3"><i class="fas fa-fist-raised"></i>
+                    <div class="card card-extra p-3"><i class="fas fa-fist-raised real-tkd"></i>
                         <h6>Taekwondo</h6>
                     </div>
                 </a></div>
             <div class="col-6 col-md-3"><a href="info-danza.html" class="card-link">
-                    <div class="card card-extra p-3"><i class="fas fa-shoe-prints"></i>
+                    <div class="card card-extra p-3"><i class="fas fa-shoe-prints real-danza"></i>
                         <h6>Danza</h6>
                     </div>
                 </a></div>
             <div class="col-6 col-md-3"><a href="info-americano.html" class="card-link">
-                    <div class="card card-extra p-3"><i class="fas fa-football-ball"></i>
+                    <div class="card card-extra p-3"><i class="fas fa-football-ball real-tocho"></i>
                         <h6>Tocho Bandera</h6>
                     </div>
                 </a></div>
@@ -317,52 +448,52 @@
         <h2 class="section-title">After School</h2>
         <div class="row mt-4">
             <div class="col-6 col-md-3"><a href="after-italiano.html" class="card-link">
-                    <div class="card card-extra p-3"><i class="fas fa-monument"></i>
+                    <div class="card card-extra p-3"><i class="fas fa-monument real-italiano"></i>
                         <h6>Italiano</h6>
                     </div>
                 </a></div>
             <div class="col-6 col-md-3"><a href="after-pintura.html" class="card-link">
-                    <div class="card card-extra p-3"><i class="fas fa-palette"></i>
+                    <div class="card card-extra p-3"><i class="fas fa-palette real-pintura"></i>
                         <h6>Artes y Pintura</h6>
                     </div>
                 </a></div>
             <div class="col-6 col-md-3"><a href="after-manualidades.html" class="card-link">
-                    <div class="card card-extra p-3"><i class="fas fa-cut"></i>
+                    <div class="card card-extra p-3"><i class="fas fa-cut real-manualidades"></i>
                         <h6>Manualidades</h6>
                     </div>
                 </a></div>
             <div class="col-6 col-md-3"><a href="after-destrezas.html" class="card-link">
-                    <div class="card card-extra p-3"><i class="fas fa-puzzle-piece"></i>
+                    <div class="card card-extra p-3"><i class="fas fa-puzzle-piece real-juegos"></i>
                         <h6>Juegos y Destrezas</h6>
                     </div>
                 </a></div>
             <div class="col-6 col-md-3"><a href="after-clubtareas.html" class="card-link">
-                    <div class="card card-extra p-3"><i class="fas fa-edit"></i>
+                    <div class="card card-extra p-3"><i class="fas fa-edit real-tareas"></i>
                         <h6>Club de Tareas</h6>
                     </div>
                 </a></div>
             <div class="col-6 col-md-3"><a href="after-soccer.html" class="card-link">
-                    <div class="card card-extra p-3"><i class="fas fa-futbol"></i>
+                    <div class="card card-extra p-3"><i class="fas fa-futbol real-futbol"></i>
                         <h6>Futbol Soccer</h6>
                     </div>
                 </a></div>
             <div class="col-6 col-md-3"><a href="after-hawaiano.html" class="card-link">
-                    <div class="card card-extra p-3"><i class="fas fa-leaf"></i>
+                    <div class="card card-extra p-3"><i class="fas fa-leaf real-hawaiano"></i>
                         <h6>Hawaiano</h6>
                     </div>
                 </a></div>
             <div class="col-6 col-md-3"><a href="after-voleibol.html" class="card-link">
-                    <div class="card card-extra p-3"><i class="fas fa-volleyball-ball"></i>
+                    <div class="card card-extra p-3"><i class="fas fa-volleyball-ball real-voleibol"></i>
                         <h6>Voleibol</h6>
                     </div>
                 </a></div>
             <div class="col-6 col-md-3"><a href="after-porristas.html" class="card-link">
-                    <div class="card card-extra p-3"><i class="fas fa-star"></i>
+                    <div class="card card-extra p-3"><i class="fas fa-star real-porristas"></i>
                         <h6>Porristas</h6>
                     </div>
                 </a></div>
             <div class="col-6 col-md-3"><a href="after-basquetbol.html" class="card-link">
-                    <div class="card card-extra p-3"><i class="fas fa-basketball-ball"></i>
+                    <div class="card card-extra p-3"><i class="fas fa-basketball-ball real-basquet"></i>
                         <h6>Basquetbol</h6>
                     </div>
                 </a></div>
@@ -371,12 +502,12 @@
         <h2 class="section-title">Regularizaciones</h2>
         <div class="row mt-4">
             <div class="col-6 col-md-3"><a href="regula-ingles.html" class="card-link">
-                    <div class="card card-extra p-3"><i class="fas fa-globe-americas"></i>
+                    <div class="card card-extra p-3"><i class="fas fa-globe-americas real-ingles"></i>
                         <h6>Inglés</h6>
                     </div>
                 </a></div>
             <div class="col-6 col-md-3"><a href="regula-espanol.html" class="card-link">
-                    <div class="card card-extra p-3"><i class="fas fa-book-reader"></i>
+                    <div class="card card-extra p-3"><i class="fas fa-book-reader real-espanol"></i>
                         <h6>Español</h6>
                     </div>
                 </a></div>
@@ -387,12 +518,10 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-8 text-center text-md-left mb-3 mb-md-0">
-                    <p class="mb-0 text-white">© 2026 <strong>Colegio Niños Héroes Atizapán</strong>. Todos los derechos
-                        reservados.</p>
+                    <p class="mb-0 text-white">© 2026 <strong>Colegio Niños Héroes Atizapán</strong>. Todos los derechos reservados.</p>
                 </div>
                 <div class="col-md-4 text-center text-md-right">
-                    <a href="bolsa-trabajo.html" class="link-unete"><i class="fas fa-briefcase mr-2"></i>Únete a nuestro
-                        equipo</a>
+                    <a href="bolsa-trabajo.html" class="link-unete"><i class="fas fa-briefcase mr-2"></i>Únete a nuestro equipo</a>
                 </div>
             </div>
         </div>

@@ -40,29 +40,50 @@
         }
 
         .nivel-aviso {
-            background: #f8f9fa;
             border-radius: 8px;
             padding: 12px;
             margin-top: 15px;
             font-size: 0.95rem;
             color: #333;
-            border-top: 3px solid #193E9A;
             text-align: left;
             min-height: 80px;
         }
 
         .nivel-aviso strong {
-            color: #193E9A;
             display: block;
             margin-bottom: 5px;
             text-transform: uppercase;
             font-size: 0.75rem;
         }
 
+        /* --- COLORES PASTEL POR NIVEL EDUCATIVO --- */
+        .aviso-preescolar {
+            background-color: #FFE5EC !important;
+            border-top: 3px solid #E91E63;
+        }
+        .aviso-preescolar strong { color: #D81B60; }
+
+        .aviso-primaria {
+            background-color: #E8F5E9 !important;
+            border-top: 3px solid #317F77;
+        }
+        .aviso-primaria strong { color: #317F77; }
+
+        .aviso-secundaria {
+            background-color: #E3F2FD !important;
+            border-top: 3px solid #193E9A;
+        }
+        .aviso-secundaria strong { color: #193E9A; }
+
+        .aviso-preparatoria {
+            background-color: #F3E5F5 !important;
+            border-top: 3px solid #9C27B0;
+        }
+        .aviso-preparatoria strong { color: #8E24AA; }
+
         /* Botón de WhatsApp Estilo Limpio (Igual a Oferta Educativa) */
         .btn-whatsapp-nav {
             background-color: #38b44a !important;
-            /* El verde exacto de la imagen */
             border-color: #38b44a !important;
             color: white !important;
             font-weight: 700 !important;
@@ -80,7 +101,6 @@
             background-color: #2e963d !important;
             text-decoration: none !important;
             transform: none;
-            /* Quitamos el salto para que sea serio */
         }
 
         .btn-whatsapp-nav i {
@@ -117,7 +137,7 @@
             background-color: #317F77;
         }
 
-       .footer-colegio {
+        .footer-colegio {
             background-color: #193E9A;
             padding: 30px 0;
             margin-top: 50px;
@@ -146,8 +166,7 @@
 <body>
     <div class="top-bar d-none d-md-block">
         <div class="container d-flex justify-content-between align-items-center">
-            <div><i class="fas fa-envelope mr-1"></i> cnh.admi@hotmail.com | 55 5820 4881 - 55 9055 7078
-</div>
+            <div><i class="fas fa-envelope mr-1"></i> cnh.admi@hotmail.com | 55 5820 4881 - 55 9055 7078</div>
             <div><a href="#" style="color:white;"><i class="fab fa-facebook-f"></i></a></div>
         </div>
     </div>
@@ -188,30 +207,34 @@
         <div class="row text-center mb-5">
             <div class="col-md-3 mb-4">
                 <div class="card card-moderna p-3 h-100">
-                    <h5 style="color: #193E9A; font-weight: bold;">Kinder</h5>
-                    <div class="nivel-aviso"><strong>Último Aviso:</strong><span id="aviso-Kinder">Cargando...</span>
+                    <h5 style="color: #193E9A; font-weight: bold;">Preescolar</h5>
+                    <div class="nivel-aviso aviso-preescolar">
+                        <strong>Último Aviso:</strong><span id="aviso-Preescolar">Cargando...</span>
                     </div>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
                 <div class="card card-moderna p-3 h-100">
                     <h5 style="color: #193E9A; font-weight: bold;">Primaria</h5>
-                    <div class="nivel-aviso"><strong>Último Aviso:</strong><span id="aviso-Primaria">Cargando...</span>
+                    <div class="nivel-aviso aviso-primaria">
+                        <strong>Último Aviso:</strong><span id="aviso-Primaria">Cargando...</span>
                     </div>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
                 <div class="card card-moderna p-3 h-100">
                     <h5 style="color: #193E9A; font-weight: bold;">Secundaria</h5>
-                    <div class="nivel-aviso"><strong>Último Aviso:</strong><span
-                            id="aviso-Secundaria">Cargando...</span></div>
+                    <div class="nivel-aviso aviso-secundaria">
+                        <strong>Último Aviso:</strong><span id="aviso-Secundaria">Cargando...</span>
+                    </div>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
                 <div class="card card-moderna p-3 h-100">
                     <h5 style="color: #193E9A; font-weight: bold;">Preparatoria</h5>
-                    <div class="nivel-aviso"><strong>Último Aviso:</strong><span
-                            id="aviso-Preparatoria">Cargando...</span></div>
+                    <div class="nivel-aviso aviso-preparatoria">
+                        <strong>Último Aviso:</strong><span id="aviso-Preparatoria">Cargando...</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -240,12 +263,10 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-8 text-center text-md-left mb-3 mb-md-0">
-                    <p class="mb-0 text-white">© 2026 <strong>Colegio Niños Héroes Atizapán</strong>. Todos los derechos
-                        reservados.</p>
+                    <p class="mb-0 text-white">© 2026 <strong>Colegio Niños Héroes Atizapán</strong>. Todos los derechos reservados.</p>
                 </div>
                 <div class="col-md-4 text-center text-md-right">
-                    <a href="bolsa-trabajo.html" class="link-unete"><i class="fas fa-briefcase mr-2"></i>Únete a nuestro
-                        equipo</a>
+                    <a href="bolsa-trabajo.html" class="link-unete"><i class="fas fa-briefcase mr-2"></i>Únete a nuestro equipo</a>
                 </div>
             </div>
         </div>
@@ -253,21 +274,32 @@
 
     <script>
         const idAnuncios = '18JCUK-SGSQCXMvWng3O3hZYxD4GU_BVILkvO_tawDZo';
+        
         function cargarAviso(pestana) {
             const url = `https://docs.google.com/spreadsheets/d/${idAnuncios}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(pestana)}`;
+            
             Papa.parse(url, {
                 download: true,
                 complete: function (results) {
                     const filasConDatos = results.data.filter(fila => fila[0] && fila[0].trim() !== "");
-                    const elemento = document.getElementById(`aviso-${pestana}`);
+                    
+                    // Si la pestaña de Excel es 'Kinder', mandamos la información al contenedor 'Preescolar'
+                    const idElemento = (pestana === 'Kinder') ? 'aviso-Preescolar' : `aviso-${pestana}`;
+                    const elemento = document.getElementById(idElemento);
+                    
                     if (!elemento) return;
+                    
                     if (filasConDatos.length > 0) {
                         elemento.innerText = (pestana === 'General' && filasConDatos.length > 1) ? filasConDatos[1][0] : filasConDatos[0][0];
-                    } else { elemento.innerText = "Sin avisos recientes."; }
+                    } else { 
+                        elemento.innerText = "Sin avisos recientes."; 
+                    }
                 }
             });
         }
+        
         window.onload = function () {
+            // Se sigue llamando 'Kinder' aquí para que lea la pestaña correcta del Excel
             ['General', 'Kinder', 'Primaria', 'Secundaria', 'Preparatoria'].forEach(s => cargarAviso(s));
         };
     </script>
