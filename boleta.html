@@ -251,14 +251,14 @@
             font-weight: 800;
         }
 
-        /* APLICACIÓN FORZOSA DE LOS COLORES PASTEL FIJOS EN LAS CELDAS (REEMPLAZA EL GRIS) */
+        /* ASIGNACIÓN DE COLORES PASTEL FORZOSOS A LAS CELDAS DE LA TABLA */
         .pastel-amarillo tbody tr td { background-color: #FFF5B7 !important; color: #5d4037 !important; }
         .pastel-rosa tbody tr td     { background-color: #FFB7CE !important; color: #4a148c !important; }
         .pastel-verde tbody tr td    { background-color: #C1E7C4 !important; color: #1b5e20 !important; }
         .pastel-azul tbody tr td     { background-color: #B3E5FC !important; color: #0d47a1 !important; }
         .pastel-lila tbody tr td     { background-color: #E1BEE7 !important; color: #4a148c !important; }
 
-        /* Destacar columna de promedio final */
+        /* Resaltar visualmente la columna del promedio final */
         .grade-table tbody tr td:last-child { 
             font-weight: 900 !important; 
             background-color: rgba(0, 0, 0, 0.08) !important;
@@ -339,30 +339,38 @@
 
         const MATERIAS_MAP = {
             ingles: (n) => {
-                const nl = n.toUpperCase();
+                const nl = normalizeText(n);
                 if (nl.includes('MATERNAL') || nl.includes('KINDER')) return ['LISTENING', 'READING'];
                 return ['LISTENING', 'READING', 'WRITING', 'SPEAKING', 'COMPOSITION'];
             },
             extra: (n) => {
-                const nl = n.toUpperCase();
-                if (nl.includes('MATERNAL') || nl.includes('KINDER')) return ['EDUCACIÓN FISÍCA', 'DANZA', 'MÚSICA', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMÁTICA', 'EMOCIONES'];
-                if (nl.includes('PRIMARIA 1') || nl.includes('PRIMARIA 2')) return ['EDUCACIÓN FISÍCA', 'DANZA', 'MÚSICA', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMÁTICA', 'JUEGOS Y DESTREZAS', 'ROBÓTICA', 'EDUCACIÓN FINANCIERA', 'SISTÉMICA', 'LECTURA', 'SPELLING BEE'];
-                if (nl.includes('PRIMARIA')) return ['EDUCACIÓN FISÍCA', 'DANZA', 'MÚSICA', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMÁTICA', 'JUEGOS Y DESTREZAS', 'ROBÓTICA', 'EDUCACIÓN FINANCIERA', 'SISTÉMICA'];
-                if (nl.includes('SECUNDARIA 2')) return ['EDUCACIÓN FISÍCA', 'DANZA', 'ARTES', 'MÚSICA', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMÁTICA', 'HERRAMIENTAS DIGITALES', 'AJEDREZ', 'ROBÓTICA', 'ORTOGRAFÍA', 'SISTÉMICA'];
-                if (nl.includes('SECUNDARIA')) return ['EDUCACIÓN FISÍCA', 'DANZA', 'ARTES', 'MÚSICA', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMÁTICA', 'HERRAMIENTAS DIGITALES', 'AJEDREZ', 'ROBÓTICA', 'SISTÉMICA'];
-                if (nl.includes('PREPARATORIA')) return ['EDUCACIÓN FISÍCA', 'DANZA', 'ARTES', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMÁTICA', 'HERRAMIENTAS DIGITALES', 'AJEDREZ', 'ROBÓTICA'];
+                const nl = normalizeText(n);
+                if (nl.includes('MATERNAL') || nl.includes('KINDER')) return ['EDUCACION FISICA', 'DANZA', 'MUSICA', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMATICA', 'EMOCIONES'];
+                if (nl.includes('PRIMARIA 1') || nl.includes('PRIMARIA 2')) return ['EDUCACION FISICA', 'DANZA', 'MUSICA', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMATICA', 'JUEGOS Y DESTREZAS', 'ROBOTICA', 'EDUCACION FINANCIERA', 'SISTEMICA', 'LECTURA', 'SPELLING BEE'];
+                if (nl.includes('PRIMARIA')) return ['EDUCACION FISICA', 'DANZA', 'MUSICA', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMATICA', 'JUEGOS Y DESTREZAS', 'ROBOTICA', 'EDUCACION FINANCIERA', 'SISTEMICA'];
+                if (nl.includes('SECUNDARIA 2')) return ['EDUCACION FISICA', 'DANZA', 'ARTES', 'MUSICA', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMATICA', 'HERRAMIENTAS DIGITALES', 'AJEDREZ', 'ROBOTICA', 'ORTOGRAFIA', 'SISTEMICA'];
+                if (nl.includes('SECUNDARIA')) return ['EDUCACION FISICA', 'DANZA', 'ARTES', 'MUSICA', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMATICA', 'HERRAMIENTAS DIGITALES', 'AJEDREZ', 'ROBOTICA', 'SISTEMICA'];
+                if (nl.includes('PREPARATORIA')) return ['EDUCACION FISICA', 'DANZA', 'ARTES', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMATICA', 'HERRAMIENTAS DIGITALES', 'AJEDREZ', 'ROBOTICA'];
                 return [];
             }
         };
 
+        // Función clave: remueve acentos y caracteres raros para evitar errores de lectura
+        function normalizeText(text) {
+            if (!text) return "";
+            return text.toString().trim().toUpperCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "");
+        }
+
         function obtenerClaseColor(nivel) {
-            const n = nivel.toUpperCase();
+            const n = normalizeText(nivel);
             if (n.includes('MATERNAL')) return 'pastel-amarillo';
             if (n.includes('KINDER')) return 'pastel-rosa';
             if (n.includes('PRIMARIA')) return 'pastel-verde';
             if (n.includes('SECUNDARIA')) return 'pastel-azul';
             if (n.includes('PREPARATORIA')) return 'pastel-lila';
-            return '';
+            return 'pastel-verde'; // Color base por si falla la autodetección
         }
 
         const fmt = (v) => {
@@ -371,7 +379,7 @@
         };
 
         async function buscarBoletas() {
-            const mat = document.getElementById('matriculaInput').value.trim().toUpperCase();
+            const mat = normalizeText(document.getElementById('matriculaInput').value);
             const status = document.getElementById('statusMsg');
             if (!mat) { status.innerText = "Ingrese una matrícula."; return; }
 
@@ -392,7 +400,7 @@
                 if (dEx) renderBoleta(dEx, 'Extra', 'ASIGNATURAS EXTRACURRICULARES');
                 if (dIn) renderBoleta(dIn, 'Ingles', 'BOLETA DE INGLÉS');
             } else {
-                status.innerHTML = "<span class='text-danger'><i class='fas fa-exclamation-triangle mr-2'></i>Matrícula no encontrada o estructura de hoja inválida.</span>";
+                status.innerHTML = "<span class='text-danger'><i class='fas fa-exclamation-triangle mr-2'></i>Matrícula no encontrada. Asegúrese de que exista en las pestañas del archivo.</span>";
             }
         }
 
@@ -412,11 +420,11 @@
 
                     const data = Papa.parse(csv, { header: false, skipEmptyLines: true }).data;
 
-                    // Encontrar la cabecera buscando de forma flexible la celda que contenga "MATRICULA"
-                    const hIdx = data.findIndex(r => r.some(c => c && c.toString().trim().toUpperCase().includes('MATRICULA')));
+                    // Localizar la cabecera buscando "MATRICULA" sin importar acentos
+                    const hIdx = data.findIndex(r => r.some(c => c && normalizeText(c).includes('MATRICULA')));
                     if (hIdx === -1) continue;
 
-                    // ESCANEO DINÁMICO DE MATERIAS HACIA ARRIBA: Busca la primera fila superior que tenga contenido válido
+                    // Escanear hacia arriba para capturar la fila de materias de forma dinámica
                     let materiasRow = [];
                     for (let rowUp = hIdx - 1; rowUp >= 0; rowUp--) {
                         if (data[rowUp] && data[rowUp].slice(5).some(cell => cell && cell.toString().trim() !== "")) {
@@ -426,25 +434,27 @@
                     }
                     if (materiasRow.length === 0) materiasRow = data[0] || [];
 
-                    const colMatIdx = data[hIdx].findIndex(c => c && c.toString().trim().toUpperCase().includes('MATRICULA'));
+                    const colMatIdx = data[hIdx].findIndex(c => c && normalizeText(c).includes('MATRICULA'));
                     
                     // Buscar fila del alumno
-                    const studentRow = data.find((r, idx) => idx >= hIdx && r[colMatIdx] && r[colMatIdx].toString().trim().toUpperCase() === mat);
+                    const studentRow = data.find((r, idx) => idx >= hIdx && r[colMatIdx] && normalizeText(r[colMatIdx]) === mat);
 
                     if (studentRow) {
-                        const esPrepa = nivel.toUpperCase().includes('PREPARATORIA');
+                        const esPrepa = normalizeText(nivel).includes('PREPARATORIA');
                         const jump = esPrepa ? 3 : 4;
                         const filtro = MATERIAS_MAP[tipo](nivel);
                         let listaMaterias = [];
 
-                        // Recorrer las columnas numéricas de las notas a partir de la columna F (Índice 5)
+                        // Extraer las calificaciones desde la columna F (Índice 5)
                         for (let i = 5; i < studentRow.length; i += jump) {
                             
-                            // HERENCIA COMPLETA HACIA ATRÁS: Por si las celdas de materias vienen combinadas horizontalmente
+                            // Herencia hacia atrás para solucionar celdas combinadas de materias
+                            let nombreOriginal = "";
                             let nombreM = "";
                             for (let backtrack = i; backtrack >= 5; backtrack--) {
                                 if (materiasRow[backtrack] && materiasRow[backtrack].toString().trim() !== "") {
-                                    nombreM = materiasRow[backtrack].toString().trim().toUpperCase();
+                                    nombreOriginal = materiasRow[backtrack].toString().trim();
+                                    nombreM = normalizeText(materiasRow[backtrack]);
                                     break;
                                 }
                             }
@@ -455,7 +465,7 @@
 
                             if (nombreM && filtro.includes(nombreM)) {
                                 listaMaterias.push({
-                                    n: nombreM,
+                                    n: nombreOriginal.toUpperCase(), // Mostrar con el formato estético original del Excel
                                     v1: fmt(studentRow[i]),
                                     v2: fmt(studentRow[i + 1]),
                                     v3: esPrepa ? null : fmt(studentRow[i + 2]),
@@ -464,7 +474,7 @@
                             }
                         }
 
-                        // Promedio General Final del Alumno
+                        // Capturar promedio final de las últimas celdas de la fila
                         let pf = "-";
                         for (let k = studentRow.length - 1; k >= 5; k--) {
                             if (studentRow[k] && !isNaN(studentRow[k]) && studentRow[k].toString().trim() !== "") {
@@ -534,7 +544,7 @@
                             ${d.materias.length === 0 ? `
                                 <tr>
                                     <td colspan="${d.esPrepa ? 4 : 5}" style="text-align:center; padding:30px; background-color:#fff !important; color:#888;">
-                                        No se pudieron mapear las materias. Verifique que los nombres en el Excel coincidan exactamente con la lista de filtros del código.
+                                        No se pudieron mapear las materias. Verifique que las columnas del Excel no estén desplazadas.
                                     </td>
                                 </tr>
                             ` : d.materias.map(m => `
