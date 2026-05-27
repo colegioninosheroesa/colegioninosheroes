@@ -27,27 +27,32 @@
         #matriculaInput { border: none; padding-left: 30px; height: 60px; font-size: 1.1rem; }
         .btn-buscar { background: var(--verde-id) !important; color: white !important; border: none !important; padding: 0 40px; font-weight: 800; }
 
-        /* CLASES DE COLORES PASTEL ASIGNADOS */
-        .pastel-amarillo { background-color: #FFF5B7 !important; color: #5d4037 !important; }
-        .pastel-rosa { background-color: #FFB7CE !important; color: #4a148c !important; }
-        .pastel-verde { background-color: #C1E7C4 !important; color: #1b5e20 !important; }
-        .pastel-azul { background-color: #B3E5FC !important; color: #0d47a1 !important; }
-        .pastel-lila { background-color: #E1BEE7 !important; color: #4a148c !important; }
+        /* CLASES DE COLORES PASTEL ASIGNADOS CON COBERTURA DE TABLA COMPLETA */
+        .pastel-amarillo, .pastel-amarillo td, .pastel-amarillo th { background-color: #FFF5B7 !important; color: #5d4037 !important; }
+        .pastel-rosa, .pastel-rosa td, .pastel-rosa th { background-color: #FFB7CE !important; color: #4a148c !important; }
+        .pastel-verde, .pastel-verde td, .pastel-verde th { background-color: #C1E7C4 !important; color: #1b5e20 !important; }
+        .pastel-azul, .pastel-azul td, .pastel-azul th { background-color: #B3E5FC !important; color: #0d47a1 !important; }
+        .pastel-lila, .pastel-lila td, .pastel-lila th { background-color: #E1BEE7 !important; color: #4a148c !important; }
 
         /* BOLETA DISEÑO MODERNO Y ATRACTIVO */
         .report-card-container { background: white; padding: 50px; border: 1px solid #e0e0e0; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin: 0 auto 50px; max-width: 850px; display: none; color: #333; }
         
         /* TABLA ESTILIZADA SUAVE */
         .grade-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 25px; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; }
-        .grade-table th { font-weight: 700; padding: 12px 10px; font-size: 0.85rem; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; border: none; }
-        .grade-table td { border-bottom: 1px solid #eee; padding: 12px 10px; text-align: center; font-size: 0.95rem; color: #444; }
+        .grade-table th { font-weight: 800; padding: 12px 10px; font-size: 0.85rem; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; border: none; border-bottom: 2px solid rgba(0,0,0,0.1); }
+        .grade-table td { border-bottom: 1px solid rgba(0,0,0,0.08); padding: 12px 10px; text-align: center; font-size: 0.95rem; font-weight: 600; }
         .grade-table tr:last-child td { border-bottom: none; }
-        .grade-table .subject-col { text-align: left; font-weight: 700; padding-left: 20px; color: #222; }
+        .grade-table .subject-col { text-align: left; font-weight: 800; padding-left: 20px; }
 
         .signature-section { margin-top: 60px; display: flex; justify-content: space-around; }
         .sign-box { border-top: 1px solid #bbb; width: 220px; text-align: center; font-size: 0.8rem; font-weight: 700; padding-top: 8px; color: #555; }
 
+        /* FORZAR COLORES EN LA IMPRESIÓN Y DESCARGA PDF */
         @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
             .no-print, .hero-banner, .search-container, .navbar { display: none !important; }
             .report-card-container { display: block !important; border: none; box-shadow: none; padding: 0; margin: 0; width: 100%; max-width: 100%; }
             .page-break { page-break-before: always; }
@@ -111,7 +116,6 @@
         }
     };
 
-    // Función para determinar la clase de color basada en el nombre del nivel
     function obtenerClaseColor(nivel) {
         const n = nivel.toUpperCase();
         if (n.includes('MATERNAL')) return 'pastel-amarillo';
@@ -132,7 +136,7 @@
         const status = document.getElementById('statusMsg');
         if (!mat) { status.innerText = "Ingrese una matrícula."; return; }
 
-        status.innerHTML = "Buscando información...";
+        status.innerHTML = "Buscando información en todos los niveles...";
         
         document.getElementById('reportCardExtra').style.display = 'none';
         document.getElementById('reportCardIngles').style.display = 'none';
@@ -143,19 +147,20 @@
         ]);
 
         if (dEx || dIn) {
-            status.innerHTML = "<span class='text-success'>¡Información cargada!</span>";
+            status.innerHTML = "<span class='text-success'>¡Información cargada con éxito!</span>";
             document.getElementById('printBtnContainer').style.display = 'block';
             if (dEx) renderBoleta(dEx, 'Extra', 'ASIGNATURAS EXTRACURRICULARES');
             if (dIn) renderBoleta(dIn, 'Ingles', 'BOLETA DE INGLÉS');
         } else {
-            status.innerHTML = "<span class='text-danger'>Matrícula no encontrada. Verifique las listas.</span>";
+            status.innerHTML = "<span class='text-danger'>Matrícula no encontrada. Verifique el identificador o el nombre de las pestañas en su archivo de Google Sheets.</span>";
             document.getElementById('printBtnContainer').style.display = 'none';
         }
     }
 
     async function obtenerDatos(sheetId, mat, tipo) {
         for (let nivel of niveles) {
-            const url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&sheet=${encodeURIComponent(nivel)}&tqx=cb:${Date.now()}`;
+            // Se normaliza la URL de la consulta usando la codificación de URI para asegurar compatibilidad total con espacios (ej. Kinder 1)
+            const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(nivel.trim())}&tqx=cb:${Date.now()}`;
             try {
                 const res = await fetch(url);
                 if(!res.ok) continue;
@@ -208,7 +213,7 @@
                         materias: listaMaterias, pf, esPrepa, tipo
                     };
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) { console.error("Error al leer el nivel " + nivel, e); }
         }
         return null;
     }
@@ -223,8 +228,8 @@
         div.innerHTML = `
             <div style="text-align: center; position: relative; margin-bottom: 25px;">
                 <img src="Iconos/logo.png" style="position: absolute; left: 0; top: 0; height: 75px;">
-                <h1 style="color: #193E9A; margin: 0; font-size: 26px; font-weight: 800; letter-spacing: 0.5px;">COLEGIO NIÑOS HÉROES</h1>
-                <p style="font-size: 10px; margin: 4px 0; color: #555;">DURANGO S/N AMP. ADOLFO LÓPEZ MATEOS, ATIZAPÁN DE ZARAGOZA.<br>58204881 Y 5590557078</p>
+                <h1 style="color: #193E9A; margin: 0; font-size: 26px; font-weight: 800; letter-spacing: 0.5px;">COLEGIO NIÃ‘OS HÃ‰ROES</h1>
+                <p style="font-size: 10px; margin: 4px 0; color: #555;">DURANGO S/N AMP. ADOLFO LÃ“PEZ MATEOS, ATIZAPÃN DE ZARAGOZA.<br>58204881 Y 5590557078</p>
                 <h2 style="color: #317F77; border-top: 1.5px solid #193E9A; border-bottom: 1.5px solid #193E9A; padding: 6px 0; margin-top: 12px; font-size: 18px; font-weight: 700; letter-spacing: 1.5px;">${tit}</h2>
             </div>
 
@@ -245,9 +250,9 @@
                 "La educación no solo forma estudiantes, forma seres humanos capaces de soñar en grande, de levantarse ante las dificultades y de construir con esfuerzo y valores el futuro que desean alcanzar."
             </p>
 
-            <table class="grade-table">
+            <table class="grade-table ${clasePastel}">
                 <thead>
-                    <tr class="${clasePastel}">
+                    <tr>
                         <th style="text-align: left; padding-left: 20px;">Materias</th>
                         ${d.esPrepa ? '<th>1er Sem</th><th>2do Sem</th>' 
                         : '<th>1er Trim</th><th>2do Trim</th><th>3er Trim</th>'}
@@ -261,7 +266,7 @@
                             <td>${m.v1}</td>
                             <td>${m.v2}</td>
                             ${!d.esPrepa ? `<td>${m.v3}</td>` : ''}
-                            <td style="font-weight: bold; background-color: #fcfcfc;">${m.vf}</td>
+                            <td style="font-weight: 900; background-color: rgba(0,0,0,0.05) !important;">${m.vf}</td>
                         </tr>
                     `).join('')}
                 </tbody>
