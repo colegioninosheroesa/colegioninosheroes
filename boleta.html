@@ -370,7 +370,7 @@
                 const csv = await res.text();
                 const data = Papa.parse(csv, {header: false, skipEmptyLines: true}).data;
                 
-                // ESCANEO TOTAL: Busca dinámicamente la fila donde esté declarada la palabra "MATRICULA"
+                // ESCANEO TOTAL: Busca dinámicamente la columna Matricula
                 let hIdx = -1;
                 let colMatIdx = -1;
                 
@@ -389,8 +389,23 @@
 
                 const materiasRow = data[0] || []; 
                 
-                // Filtro ultra-flexible e independiente del formato exacto de matrícula
-                const studentRow = data.find((r, idx) => idx > hIdx && r[colMatIdx] && r[colMatIdx].toString().trim().toUpperCase() === mat);
+                // EXTRACCIÓN NUMÉRICA PURA: Compara solo los números finales de la matrícula para evitar fallos por las letras intermedias
+                const digitosBusqueda = mat.replace(/\D/g, ""); 
+
+                const studentRow = data.find((r, idx) => {
+                    if (idx <= hIdx || !r[colMatIdx]) return false;
+                    const valCelda = r[colMatIdx].toString().trim().toUpperCase();
+                    
+                    // Intento 1: Coincidencia exacta
+                    if (valCelda === mat) return true;
+                    
+                    // Intento 2: Coincidencia de números finales (ej: 001 con 001)
+                    const digitosCelda = valCelda.replace(/\D/g, "");
+                    if (digitosBusqueda && digitosCelda && parseInt(digitosBusqueda, 10) === parseInt(digitosCelda, 10)) {
+                        return true;
+                    }
+                    return false;
+                });
 
                 if (studentRow) {
                     const esPrepa = nombrePestaña.toUpperCase().includes('PREPARATORIA');
