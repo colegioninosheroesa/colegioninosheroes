@@ -107,7 +107,27 @@
             margin: 0 auto 50px;
             max-width: 850px;
             display: none;
+            position: relative; /* Esencial para posicionar el sello de fondo */
             overflow: hidden;
+        }
+
+        /* SELLO INSTITUCIONAL / MARCA DE AGUA CENTRADA */
+        .sello-agua-fondo {
+            position: absolute;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-10deg);
+            width: 400px;
+            height: auto;
+            opacity: 0.06; /* Atenuado ideal para no interferir con las notas */
+            pointer-events: none; /* No interrumpe la selección de texto */
+            z-index: 1;
+        }
+
+        /* CAPA DEL CONTENIDO POR ENCIMA DEL SELLO */
+        .boleta-content-wrapper {
+            position: relative;
+            z-index: 2;
         }
 
         /* CABECERA INSTITUCIONAL */
@@ -121,11 +141,8 @@
             border-bottom: 2px solid #edf2f7;
         }
         
-        /* EFECTO SELLO DORADO EN LOGO */
         .logo-boleta { 
             height: 95px; 
-            filter: sepia(0.4) saturate(2.5) hue-rotate(10deg) brightness(0.95) contrast(1.1);
-            opacity: 0.95;
         }
         .school-info { text-align: right; }
         .school-name { font-weight: 800; font-size: 1.7rem; color: var(--azul-id); margin: 0; }
@@ -182,7 +199,7 @@
         .final-grade-value { font-size: 1.7rem; font-weight: 900; color: #2B6CB0; line-height: 1; }
 
         /* TABLA CONFIGURABLE CON COLORES ARMÓNICOS */
-        .grade-table-container { border-radius: 15px; overflow: hidden; border: 1px solid #E2E8F0; }
+        .grade-table-container { border-radius: 15px; overflow: hidden; border: 1px solid #E2E8F0; margin-bottom: 20px; }
         .grade-table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 0; }
         .grade-table thead th { font-weight: 800; text-transform: uppercase; font-size: 0.82rem; padding: 14px 10px; text-align: center; border: none; }
         .grade-table thead th.subject-col { text-align: left; padding-left: 25px; }
@@ -210,34 +227,6 @@
         .pastel-lila tbody tr td { background-color: #F3E5F5 !important; color: #4a148c !important; }
         .pastel-lila tbody tr td.promedio-col { background-color: #BA68C8 !important; font-weight: 900 !important; }
 
-        /* SECCIÓN DE FIRMAS ACTUALIZADA */
-        .signature-section { 
-            margin-top: 50px; 
-            display: flex; 
-            justify-content: space-around; 
-            padding: 0 10px; 
-        }
-        .sign-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 260px;
-        }
-        .sign-space {
-            height: 65px;
-            width: 100%;
-        }
-        .sign-box { 
-            border-top: 1.5px solid #718096; 
-            width: 100%;
-            text-align: center; 
-            font-size: 0.78rem; 
-            font-weight: 700; 
-            padding-top: 8px; 
-            color: #2D3748; 
-            letter-spacing: 0.5px; 
-        }
-
         /* IMPRESIÓN */
         @media print {
             body { background-color: white !important; }
@@ -246,6 +235,7 @@
             .report-card-container { display: block !important; border: none; box-shadow: none; padding: 0; margin: 0; width: 100%; max-width: 100%; border-radius: 0; }
             .header-boleta { margin: 0 0 30px 0; padding: 20px 0; }
             .page-break { page-break-before: always; }
+            .sello-agua-fondo { opacity: 0.08 !important; } /* Visibilidad ideal al guardar en PDF o imprimir */
         }
     </style>
 </head>
@@ -285,6 +275,7 @@
         const idExtra = '12m7RYtCBAF-P6t8_hoS3TkJwVX0tHEf7uaHAs6m0pTs';
         const idIngles = '1EY955TiJLZtpffxAtNQW3bjVuw8vHfYm_JYhX_6hXd4';
 
+        // Nombres exactos de tus pestañas según la captura cargada
         const PESTANAS_SISTEMA = [
             "Maternal", "Kinder 1", "Kinder 2", "Kinder 3",
             "Primaria 1", "Primaria 2", "Primaria 3", "Primaria 4", "Primaria 5", "Primaria 6",
@@ -372,8 +363,8 @@
         }
 
         async function obtenerDatosPorPestaña(sheetId, mat, nombrePestaña, textoNivelCompleto, tipo) {
-            // CORRECCIÓN CLAVE: Usamos la URL estructurada con 'export' y forzamos la descarga del CSV puro asignando tqx=out:csv y la pestaña correcta de forma simultánea.
-            const url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&sheet=${encodeURIComponent(nombrePestaña)}&tqx=out:csv&tqx=cb:${Date.now()}`;
+            // SOLUCIÓN CLAVE: Cambiado de '/export' a '/gviz/tq?tqx=out:csv' especificando la pestaña de forma compatible
+            const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(nombrePestaña)}&cb=${Date.now()}`;
             try {
                 const res = await fetch(url);
                 if (!res.ok) return null; 
@@ -389,7 +380,6 @@
                 for (let r = 2; r < data.length; r++) {
                     if (data[r] && data[r][0] !== undefined && data[r][0] !== null) {
                         const celdaMatricula = data[r][0].toString().trim().toUpperCase();
-                        // Comparación flexible e inmune a la variación de caracteres o longitudes
                         if (celdaMatricula === mat) {
                             studentRow = data[r];
                             break;
@@ -435,9 +425,7 @@
                         materias: listaMaterias, pf, esPrepa, tipo
                     };
                 }
-            } catch (e) { 
-                // Permite continuar la iteración en caso de fallo en una pestaña específica
-            }
+            } catch (e) { }
             return null;
         }
 
@@ -445,71 +433,64 @@
             const div = document.getElementById(`reportCard${idS}`);
             div.style.display = 'block';
             
-            const firmaCoordinacion = d.tipo === 'ingles' ? 'COORDINACIÓN DE INGLÉS' : 'COORDINACIÓN EXTRACURRICULAR';
             const clasePastel = obtenerClaseColor(d.nivel);
             const claseTituloColor = obtenerClaseClaseTitulo(d.nivel);
 
+            // Estructura limpia: Se integró el sello central de agua y se quitó por completo el div inferior de firmas.
             div.innerHTML = `
-                <div class="header-boleta">
-                    <img src="Iconos/logo.png" class="logo-boleta">
-                    <div class="school-info">
-                        <h1 class="school-name">COLEGIO NIÑOS HÉROES</h1>
-                        <h2 class="school-subtitle">Sección Académica</h2>
-                        <p class="school-address">DURANGO S/N AMP. ADOLFO LÓPEZ MATEOS, ATIZAPÁN DE ZARAGOZA.<br>TELS: 58204881 Y 5590557078</p>
+                <img src="Iconos/logo.png" class="sello-agua-fondo">
+
+                <div class="boleta-content-wrapper">
+                    <div class="header-boleta">
+                        <img src="Iconos/logo.png" class="logo-boleta">
+                        <div class="school-info">
+                            <h1 class="school-name">COLEGIO NIÑOS HÉROES</h1>
+                            <h2 class="school-subtitle">Sección Académica</h2>
+                            <p class="school-address">DURANGO S/N AMP. ADOLFO LÓPEZ MATEOS, ATIZAPÁN DE ZARAGOZA.<br>TELS: 58204881 Y 5590557078</p>
+                        </div>
                     </div>
-                </div>
 
-                <div class="boleta-title-box">
-                    <div class="boleta-title-text ${claseTituloColor}">${tit}</div>
-                </div>
-
-                <div class="student-info-grid">
-                    <div class="info-item"><span class="info-label">Ciclo Escolar:</span> <span class="info-value">${d.ciclo}</span></div>
-                    <div class="info-item"><span class="info-label">Grado:</span> <span class="info-value">${d.grado}</span></div>
-                    <div class="info-item"><span class="info-label">Alumno:</span> <span class="info-value">${d.nombre}</span></div>
-                    <div class="info-item"><span class="info-label">Grupo:</span> <span class="info-value">${d.grupo}</span></div>
-                    
-                    <div class="final-grade-box">
-                        <span class="final-grade-label">Calificación Final General:</span>
-                        <span class="final-grade-value">${d.pf}</span>
+                    <div class="boleta-title-box">
+                        <div class="boleta-title-text ${claseTituloColor}">${tit}</div>
                     </div>
-                </div>
 
-                <p style="font-style: italic; font-size: 0.82rem; text-align: center; margin: 25px 0; color: #718096; padding: 0 30px; line-height: 1.4;">
-                    "La educación no solo forma estudiantes, forma seres humanos capaces de soñar en grande, de levantarse ante las dificultades y de construir con esfuerzo y valores el futuro que desean alcanzar."
-                </p>
+                    <div class="student-info-grid">
+                        <div class="info-item"><span class="info-label">Ciclo Escolar:</span> <span class="info-value">${d.ciclo}</span></div>
+                        <div class="info-item"><span class="info-label">Grado:</span> <span class="info-value">${d.grado}</span></div>
+                        <div class="info-item"><span class="info-label">Alumno:</span> <span class="info-value">${d.nombre}</span></div>
+                        <div class="info-item"><span class="info-label">Grupo:</span> <span class="info-value">${d.grupo}</span></div>
+                        
+                        <div class="final-grade-box">
+                            <span class="final-grade-label">Calificación Final General:</span>
+                            <span class="final-grade-value">${d.pf}</span>
+                        </div>
+                    </div>
 
-                <div class="grade-table-container">
-                    <table class="grade-table ${clasePastel}">
-                        <thead>
-                            <tr>
-                                <th class="subject-col">Materias</th>
-                                ${d.esPrepa ? '<th>1er Sem</th><th>2do Sem</th>' : '<th>1er Trim</th><th>2do Trim</th><th>3er Trim</th>'}
-                                <th>Promedio Final</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${d.materias.map(m => `
+                    <p style="font-style: italic; font-size: 0.82rem; text-align: center; margin: 25px 0; color: #718096; padding: 0 30px; line-height: 1.4;">
+                        "La educación no solo forma estudiantes, forma seres humanos capaces de soñar en grande, de levantarse ante las dificultades y de construir con esfuerzo y valores el futuro que desean alcanzar."
+                    </p>
+
+                    <div class="grade-table-container">
+                        <table class="grade-table ${clasePastel}">
+                            <thead>
                                 <tr>
-                                    <td class="subject-col">${m.n}</td>
-                                    <td>${m.v1}</td>
-                                    <td>${m.v2}</td>
-                                    ${!d.esPrepa ? `<td>${m.v3}</td>` : ''}
-                                    <td class="promedio-col">${m.vf}</td>
+                                    <th class="subject-col">Materias</th>
+                                    ${d.esPrepa ? '<th>1er Sem</th><th>2do Sem</th>' : '<th>1er Trim</th><th>2do Trim</th><th>3er Trim</th>'}
+                                    <th>Promedio Final</th>
                                 </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="signature-section">
-                    <div class="sign-container">
-                        <div class="sign-space"></div>
-                        <div class="sign-box">DIRECCIÓN GENERAL</div>
-                    </div>
-                    <div class="sign-container">
-                        <div class="sign-space"></div>
-                        <div class="sign-box">${firmaCoordinacion}</div>
+                            </thead>
+                            <tbody>
+                                ${d.materias.map(m => `
+                                    <tr>
+                                        <td class="subject-col">${m.n}</td>
+                                        <td>${m.v1}</td>
+                                        <td>${m.v2}</td>
+                                        ${!d.esPrepa ? `<td>${m.v3}</td>` : ''}
+                                        <td class="promedio-col">${m.vf}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             `;
