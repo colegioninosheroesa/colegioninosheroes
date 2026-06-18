@@ -7,6 +7,7 @@
     <title>Consulta de Calificaciones - Colegio Niños Héroes</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         :root {
             --azul-id: #193E9A;
@@ -222,7 +223,7 @@
         .grade-table tbody tr td { padding: 14px 10px; text-align: center; font-weight: 700; font-size: 0.95rem; border: none; border-bottom: 1px solid rgba(0,0,0,0.04) !important; }
         .grade-table tbody tr td.subject-col { text-align: left; padding-left: 25px; font-weight: 800; }
 
-        /* PALETAS DE COLOR TEMÁTICAS */
+        /* PALETAS DE COLOR */
         .pastel-amarillo thead th { background-color: #FBC02D !important; color: #5d4037 !important; }
         .pastel-amarillo tbody tr td { background-color: #FFF9C4 !important; color: #5d4037 !important; }
         .pastel-amarillo tbody tr td.promedio-col { background-color: #FBC02D !important; font-weight: 900 !important; }
@@ -266,18 +267,18 @@
     <div class="hero-banner no-print">
         <div class="container">
             <h1>Portal de Boletas Oficiales</h1>
-            <p>Introduce la matrícula del alumno para generar sus boletas institucionales.</p>
+            <p>Introduce la matrícula para generar las boletas de manera local a partir de los libros Excel en el directorio.</p>
         </div>
     </div>
 
-    <div class="container search-container no-print">
+    <div class="container search-container no-print" id="searchSection" style="opacity: 0.5; pointer-events: none;">
         <div class="search-box-wrapper">
-            <input type="text" id="matriculaInput" class="form-control" placeholder="Ingrese la matrícula del alumno...">
-            <button class="btn btn-buscar" onclick="buscarBoletasAPI()">BUSCAR</button>
+            <input type="text" id="matriculaInput" class="form-control" placeholder="Cargando libros Excel, espere...">
+            <button class="btn btn-buscar" onclick="buscarBoletasExcel()">BUSCAR</button>
         </div>
         
-        <div class="text-center version-tag">
-            <i class="fas fa-cloud mr-1"></i> Conexión Segura vía Google Apps Script (2026) 4:35
+        <div class="text-center version-tag" id="loadStatus">
+            <i class="fas fa-spinner fa-spin mr-1"></i> Leyendo bases de datos extracurriculares e inglés...
         </div>
         
         <div id="statusMsg" class="text-center mt-3 font-weight-bold"></div>
@@ -292,9 +293,12 @@
     <div id="reportCardIngles" class="report-card-container page-break"></div>
 
     <script>
-        // URLs oficiales generadas e implementadas por el usuario
-        const URL_WEBAPP_EXTRA = "https://script.google.com/macros/s/AKfycbyYmL_kKe7OgFDZegue1IC5vIwPraU_I2o96GAQQ4Z-6oMauaT22ZgHJQBmLH_2aHMmTg/exec";
-        const URL_WEBAPP_INGLES = "https://script.google.com/macros/s/AKfycbwtw8CEQBEgcFIvW1SJgIi_6xaqZxwtKvTd0xLSYJ0JlLs1jH8W-nIODd1p0Y7mP_4Tvw/exec";
+        // NOMBRES EXACTOS DE TUS DOS ARCHIVOS EXCEL EN LA CARPETA
+        const RUTA_EXCEL_EXTRA = "Datos/BoletaExtracurriculares.xlsx";
+        const RUTA_EXCEL_INGLES = "Datos/BoletaInglés.xlsx";
+        
+        let BASE_EXTRA_MEMORIA = {};
+        let BASE_INGLES_MEMORIA = {};
 
         const MATERIAS_MAP = {
             ingles: (n) => {
@@ -314,24 +318,81 @@
             }
         };
 
-        function obtenerClaseColor(nivel) {
-            const n = nivel.toUpperCase();
-            if (n.includes('MATERNAL')) return 'pastel-amarillo';
-            if (n.includes('KINDER') || n.includes('PREESCOLAR')) return 'pastel-preescolar';
-            if (n.includes('PRIMARIA')) return 'pastel-verde';
-            if (n.includes('SECUNDARIA')) return 'pastel-azul';
-            if (n.includes('PREPARATORIA')) return 'pastel-lila';
-            return '';
+        window.addEventListener('DOMContentLoaded', () => {
+            cargarBasesDeDatosSimultaneas();
+        });
+
+        // Carga los dos archivos de forma asíncrona en paralelo
+        async function cargarBasesDeDatosSimultaneas() {
+            const labelStatus = document.getElementById('loadStatus');
+            const inputMat = document.getElementById('matriculaInput');
+            try {
+                const [resExtra, resIngles] = await Promise.all([
+                    fetch(RUTA_EXCEL_EXTRA),
+                    fetch(RUTA_EXCEL_INGLES)
+                ]);
+
+                if (!resExtra.ok) throw new Error("Falta el archivo: " + RUTA_EXCEL_EXTRA);
+                if (!resIngles.ok) throw new Error("Falta el archivo: " + RUTA_EXCEL_INGLES);
+                
+                const [bufExtra, bufIngles] = await Promise.all([
+                    resExtra.arrayBuffer(),
+                    resIngles.arrayBuffer()
+                ]);
+
+                BASE_EXTRA_MEMORIA = parsearLibroExcel(bufExtra);
+                BASE_INGLES_MEMORIA = parsearLibroExcel(bufIngles);
+
+                labelStatus.innerHTML = "<span class='text-success'><i class='fas fa-check-circle mr-1'></i> Ambos archivos Excel vinculados correctamente (Local).</span>";
+                inputMat.placeholder = "Ingrese la matrícula del alumno...";
+                document.getElementById('searchSection').style.opacity = "1";
+                document.getElementById('searchSection').style.pointerEvents = "auto";
+
+            } catch (err) {
+                console.error(err);
+                labelStatus.innerHTML = `<span class='text-danger'><i class='fas fa-times-circle mr-1'></i> Error de Directorio: Asegúrate de tener "${RUTA_EXCEL_EXTRA}" y "${RUTA_EXCEL_INGLES}" en tu carpeta.</span>`;
+            }
         }
 
-        function obtenerClaseClaseTitulo(nivel) {
-            const n = nivel.toUpperCase();
-            if (n.includes('MATERNAL')) return 'bg-titulo-maternal';
-            if (n.includes('KINDER') || n.includes('PREESCOLAR')) return 'bg-titulo-preescolar';
-            if (n.includes('PRIMARIA')) return 'bg-titulo-primaria';
-            if (n.includes('SECUNDARIA')) return 'bg-titulo-secundaria';
-            if (n.includes('PREPARATORIA')) return 'bg-titulo-prepa';
-            return '';
+        function parsearLibroExcel(arrayBuffer) {
+            const data = new Uint8Array(arrayBuffer);
+            const workbook = XLSX.read(data, { type: 'array' });
+            let mapeoTemporal = {};
+
+            workbook.SheetNames.forEach(sheetName => {
+                const worksheet = workbook.Sheets[sheetName];
+                const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                
+                if (rows.length < 3) return;
+
+                const materiasRow = rows[1];
+                const esPrepa = sheetName.toUpperCase().includes('PREPARATORIA');
+
+                for (let r = 2; r < rows.length; r++) {
+                    const studentRow = rows[r];
+                    if (!studentRow[0]) continue;
+
+                    const matricula = studentRow[0].toString().trim().toUpperCase();
+
+                    mapeoTemporal[matricula] = {
+                        nombre: studentRow[1],
+                        matricula: matricula,
+                        ciclo: studentRow[2],
+                        grado: studentRow[3],
+                        grupo: studentRow[4],
+                        nivel: sheetName.replace(/Kinder/i, 'Preescolar'),
+                        esPrepa: esPrepa,
+                        materiasRow: materiasRow,
+                        studentRow: studentRow
+                    };
+                }
+            });
+            return mapeoTemporal;
+        }
+
+        function normalizarTexto(texto) {
+            if (!texto) return "";
+            return texto.toString().trim().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
         }
 
         const fmt = (v) => {
@@ -339,50 +400,42 @@
             return (Math.floor(parseFloat(v) * 10) / 10).toFixed(1);
         };
 
-        function normalizarTexto(texto) {
-            if (!texto) return "";
-            return texto.toString().trim().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        }
-
-        async function buscarBoletasAPI() {
-            const mat = document.getElementById('matriculaInput').value.trim();
+        function buscarBoletasExcel() {
+            const mat = document.getElementById('matriculaInput').value.trim().toUpperCase();
             const status = document.getElementById('statusMsg');
 
             if (!mat) { status.innerText = "Por favor, ingrese una matrícula válida."; return; }
 
-            status.innerHTML = "<i class='fas fa-spinner fa-spin mr-2'></i>Buscando alumno en registros oficiales...";
-            
             document.getElementById('reportCardExtra').style.display = 'none';
             document.getElementById('reportCardIngles').style.display = 'none';
             document.getElementById('printBtnContainer').style.display = 'none';
 
-            try {
-                const [resExtra, resIngles] = await Promise.all([
-                    fetch(`${URL_WEBAPP_EXTRA}?matricula=${encodeURIComponent(mat)}`).then(r => r.json()),
-                    fetch(`${URL_WEBAPP_INGLES}?matricula=${encodeURIComponent(mat)}`).then(r => r.json())
-                ]);
+            const alumnoExtra = BASE_EXTRA_MEMORIA[mat];
+            const alumnoIngles = BASE_INGLES_MEMORIA[mat];
 
-                if (resExtra.encontrado || resIngles.encontrado) {
-                    status.innerHTML = "<span class='text-success'>¡Información cargada correctamente!</span>";
-                    document.getElementById('printBtnContainer').style.display = 'block';
+            if (alumnoExtra || alumnoIngles) {
+                status.innerHTML = "<span class='text-success'>¡Información cargada con éxito!</span>";
+                document.getElementById('printBtnContainer').style.display = 'block';
 
-                    if (resExtra.encontrado) procesarYRenderizar(resExtra, 'Extra', 'ASIGNATURAS EXTRACURRICULARES', 'extra');
-                    if (resIngles.encontrado) procesarYRenderizar(resIngles, 'Ingles', 'BOLETA DE INGLÉS', 'ingles');
-                } else {
-                    status.innerHTML = `<span class='text-danger'>La matrícula "${mat}" no se encuentra en las listas.</span>`;
+                // Si está en el Excel de extracurriculares, pinta su boleta
+                if (alumnoExtra) {
+                    renderizarFilaExcel(alumnoExtra, 'Extra', 'ASIGNATURAS EXTRACURRICULARES', 'extra');
                 }
-            } catch (error) {
-                console.error(error);
-                status.innerHTML = "<span class='text-danger'>Error de comunicación. Asegúrate de haber guardado e implementado correctamente las Apps Script como Públicas.</span>";
+                // Si está en el Excel de inglés, pinta su boleta
+                if (alumnoIngles) {
+                    renderizarFilaExcel(alumnoIngles, 'Ingles', 'BOLETA DE INGLÉS', 'ingles');
+                }
+            } else {
+                status.innerHTML = `<span class='text-danger'>La matrícula "${mat}" no se encontró en ningún archivo Excel.</span>`;
             }
         }
 
-        function procesarYRenderizar(res, idS, tituloFormateado, tipoMateria) {
-            const studentRow = res.studentRow;
-            const materiasRow = res.materiasRow;
-            const jump = res.esPrepa ? 3 : 4;
+        function renderizarFilaExcel(alumno, idS, tituloFormateado, tipoMateria) {
+            const studentRow = alumno.studentRow;
+            const materiasRow = alumno.materiasRow;
+            const jump = alumno.esPrepa ? 3 : 4;
             
-            const filtroOriginal = MATERIAS_MAP[tipoMateria](res.nivel);
+            const filtroOriginal = MATERIAS_MAP[tipoMateria](alumno.nivel);
             const filtroNormalizado = filtroOriginal.map(m => normalizarTexto(m));
             let listaMaterias = [];
 
@@ -399,15 +452,15 @@
                         n: nombreMateriaCelda.toUpperCase(),
                         v1: fmt(studentRow[i]),             
                         v2: fmt(studentRow[i+1]),           
-                        v3: res.esPrepa ? null : fmt(studentRow[i+2]), 
-                        vf: res.esPrepa ? fmt(studentRow[i+2]) : fmt(studentRow[i+3]) 
+                        v3: alumno.esPrepa ? null : fmt(studentRow[i+2]), 
+                        vf: alumno.esPrepa ? fmt(studentRow[i+2]) : fmt(studentRow[i+3]) 
                     });
                 }
             }
 
             let pf = "-";
             for (let k = studentRow.length - 1; k >= 5; k--) {
-                if (studentRow[k] && !isNaN(studentRow[k]) && studentRow[k].toString().trim() !== "") {
+                if (studentRow[k] !== undefined && studentRow[k] !== null && !isNaN(studentRow[k]) && studentRow[k].toString().trim() !== "") {
                     pf = fmt(studentRow[k]);
                     break;
                 }
@@ -416,8 +469,21 @@
             const div = document.getElementById(`reportCard${idS}`);
             div.style.display = 'block';
             
-            const clasePastel = obtenerClaseColor(res.nivel);
-            const claseTituloColor = obtenerClaseClaseTitulo(res.nivel);
+            const clasePastel = alumno.nivel ? (
+                alumno.nivel.toUpperCase().includes('MATERNAL') ? 'pastel-amarillo' :
+                alumno.nivel.toUpperCase().includes('KINDER') || alumno.nivel.toUpperCase().includes('PREESCOLAR') ? 'pastel-preescolar' :
+                alumno.nivel.toUpperCase().includes('PRIMARIA') ? 'pastel-verde' :
+                alumno.nivel.toUpperCase().includes('SECUNDARIA') ? 'pastel-azul' :
+                alumno.nivel.toUpperCase().includes('PREPARATORIA') ? 'pastel-lila' : ''
+            ) : '';
+
+            const claseTituloColor = alumno.nivel ? (
+                alumno.nivel.toUpperCase().includes('MATERNAL') ? 'bg-titulo-maternal' :
+                alumno.nivel.toUpperCase().includes('KINDER') || alumno.nivel.toUpperCase().includes('PREESCOLAR') ? 'bg-titulo-preescolar' :
+                alumno.nivel.toUpperCase().includes('PRIMARIA') ? 'bg-titulo-primaria' :
+                alumno.nivel.toUpperCase().includes('SECUNDARIA') ? 'bg-titulo-secundaria' :
+                alumno.nivel.toUpperCase().includes('PREPARATORIA') ? 'bg-titulo-prepa' : ''
+            ) : '';
 
             div.innerHTML = `
                 <img src="Iconos/logo.png" class="sello-agua-fondo">
@@ -425,7 +491,7 @@
                     <div class="header-boleta">
                         <img src="Iconos/logo.png" class="logo-boleta">
                         <div class="school-info">
-                            <h1 class="school-name">COLEGIO NIÑOS HÉROES</h1>
+                            <h1 class="school-name">COLEGIO NI%C3%91OS H%C3%89ROES</h1>
                             <h2 class="school-subtitle">Sección Académica</h2>
                             <p class="school-address">DURANGO S/N AMP. ADOLFO LÓPEZ MATEOS, ATIZAPÁN DE ZARAGOZA.<br>TELS: 58204881 Y 5590557078</p>
                         </div>
@@ -436,10 +502,10 @@
                     </div>
 
                     <div class="student-info-grid">
-                        <div class="info-item"><span class="info-label">Ciclo Escolar:</span> <span class="info-value">${res.ciclo}</span></div>
-                        <div class="info-item"><span class="info-label">Grado:</span> <span class="info-value">${res.grado}</span></div>
-                        <div class="info-item"><span class="info-label">Alumno:</span> <span class="info-value">${res.nombre}</span></div>
-                        <div class="info-item"><span class="info-label">Grupo:</span> <span class="info-value">${res.grupo}</span></div>
+                        <div class="info-item"><span class="info-label">Ciclo Escolar:</span> <span class="info-value">${alumno.ciclo || '-'}</span></div>
+                        <div class="info-item"><span class="info-label">Grado:</span> <span class="info-value">${alumno.grado || '-'}</span></div>
+                        <div class="info-item"><span class="info-label">Alumno:</span> <span class="info-value">${alumno.nombre || '-'}</span></div>
+                        <div class="info-item"><span class="info-label">Grupo:</span> <span class="info-value">${alumno.grupo || '-'}</span></div>
                         
                         <div class="final-grade-box">
                             <span class="final-grade-label">Calificación Final General:</span>
@@ -456,7 +522,7 @@
                             <thead>
                                 <tr>
                                     <th class="subject-col">Materias</th>
-                                    ${res.esPrepa ? '<th>1er Sem</th><th>2do Sem</th>' : '<th>1er Trim</th><th>2do Trim</th><th>3er Trim</th>'}
+                                    ${alumno.esPrepa ? '<th>1er Sem</th><th>2do Sem</th>' : '<th>1er Trim</th><th>2do Trim</th><th>3er Trim</th>'}
                                     <th>Promedio Final</th>
                                 </tr>
                             </thead>
@@ -466,7 +532,7 @@
                                         <td class="subject-col">${m.n}</td>
                                         <td>${m.v1}</td>
                                         <td>${m.v2}</td>
-                                        ${!res.esPrepa ? `<td>${m.v3}</td>` : ''}
+                                        ${!alumno.esPrepa ? `<td>${m.v3}</td>` : ''}
                                         <td class="promedio-col">${m.vf}</td>
                                     </tr>
                                 `).join('')}
