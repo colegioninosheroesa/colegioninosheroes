@@ -98,6 +98,15 @@
             height: 50px;
         }
 
+        /* ETIQUETA DE CONTROL DE VERSIÓN */
+        .version-tag {
+            font-size: 0.78rem;
+            color: #a0aec0;
+            margin-top: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
         /* DISEÑO DE LA BOLETA MODERNA */
         .report-card-container {
             background: var(--blanco);
@@ -111,17 +120,35 @@
             overflow: hidden;
         }
 
-        /* MARCA DE AGUA CENTRADA */
+        /* MARCA DE AGUA EN EL FONDO CENTRADA */
         .sello-agua-fondo {
             position: absolute;
-            top: 55%;
+            top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(-10deg);
-            width: 400px;
+            width: 420px;
             height: auto;
-            opacity: 0.06;
+            opacity: 0.05;
             pointer-events: none;
             z-index: 1;
+        }
+
+        /* CONTENEDOR DEL SELLO INSTITUCIONAL DORADO (ABAJO) */
+        .contenedor-sello-dorado {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 35px;
+            padding-top: 10px;
+            position: relative;
+        }
+        .sello-dorado {
+            width: 110px;
+            height: auto;
+            opacity: 0.75;
+            filter: sepia(0.4) saturate(2.5) hue-rotate(10deg) brightness(0.95);
+            mix-blend-mode: multiply;
+            pointer-events: none;
         }
 
         .boleta-content-wrapper {
@@ -233,7 +260,8 @@
             .report-card-container { display: block !important; border: none; box-shadow: none; padding: 0; margin: 0; width: 100%; max-width: 100%; border-radius: 0; }
             .header-boleta { margin: 0 0 30px 0; padding: 20px 0; }
             .page-break { page-break-before: always; }
-            .sello-agua-fondo { opacity: 0.08 !important; }
+            .sello-agua-fondo { opacity: 0.06 !important; }
+            .sello-dorado { opacity: 0.85 !important; -webkit-filter: sepia(0.4) saturate(2.5) hue-rotate(10deg) brightness(0.95) !important; }
         }
     </style>
 </head>
@@ -258,6 +286,10 @@
             <button class="btn btn-buscar" onclick="buscarBoletas()">BUSCAR</button>
         </div>
         
+        <div class="text-center version-tag">
+            <i class="fas fa-code-branch mr-1"></i> Código actualizado: Versión del 18 de Junio de 2026 - 03:18 AM
+        </div>
+        
         <div id="statusMsg" class="text-center mt-3 font-weight-bold"></div>
         <div class="text-center mt-3" id="printBtnContainer" style="display:none;">
             <button class="btn btn-danger btn-lg shadow" onclick="window.print()">
@@ -273,7 +305,6 @@
         const idExtra = '12m7RYtCBAF-P6t8_hoS3TkJwVX0tHEf7uaHAs6m0pTs';
         const idIngles = '1EY955TiJLZtpffxAtNQW3bjVuw8vHfYm_JYhX_6hXd4';
 
-        // GIDs reales actualizados para ambos archivos de Google Sheets
         const GIDS_EXTRA = {
             "Maternal": "1923242623",
             "Kinder 1": "0",
@@ -518,6 +549,10 @@
                                 `).join('')}
                             </tbody>
                         </table>
+                    </div>
+
+                    <div class="contenedor-sello-dorado">
+                        <img src="Iconos/logo.png" class="sello-dorado">
                     </div>
                 </div>
             `;
