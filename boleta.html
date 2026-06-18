@@ -120,7 +120,13 @@
             background-color: #fff;
             border-bottom: 2px solid #edf2f7;
         }
-        .logo-boleta { height: 85px; }
+        
+        /* EFECTO SELLO DORADO EN LOGO */
+        .logo-boleta { 
+            height: 95px; 
+            filter: sepia(0.4) saturate(2.5) hue-rotate(10deg) brightness(0.95) contrast(1.1);
+            opacity: 0.95;
+        }
         .school-info { text-align: right; }
         .school-name { font-weight: 800; font-size: 1.7rem; color: var(--azul-id); margin: 0; }
         .school-subtitle { font-weight: 700; font-size: 1.1rem; color: var(--verde-id); margin: 2px 0 0; }
@@ -204,9 +210,33 @@
         .pastel-lila tbody tr td { background-color: #F3E5F5 !important; color: #4a148c !important; }
         .pastel-lila tbody tr td.promedio-col { background-color: #BA68C8 !important; font-weight: 900 !important; }
 
-        /* SECCIÓN DE FIRMAS */
-        .signature-section { margin-top: 70px; display: flex; justify-content: space-around; padding: 0 30px; }
-        .sign-box { border-top: 1.5px solid #718096; width: 240px; text-align: center; font-size: 0.75rem; font-weight: 700; padding-top: 8px; color: #4A5568; letter-spacing: 0.5px; }
+        /* SECCIÓN DE FIRMAS ACTUALIZADA */
+        .signature-section { 
+            margin-top: 50px; 
+            display: flex; 
+            justify-content: space-around; 
+            padding: 0 10px; 
+        }
+        .sign-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 260px;
+        }
+        .sign-space {
+            height: 65px; /* Espacio dedicado a la firma física/digital o sello */
+            width: 100%;
+        }
+        .sign-box { 
+            border-top: 1.5px solid #718096; 
+            width: 100%;
+            text-align: center; 
+            font-size: 0.78rem; 
+            font-weight: 700; 
+            padding-top: 8px; 
+            color: #2D3748; 
+            letter-spacing: 0.5px; 
+        }
 
         /* IMPRESIÓN */
         @media print {
@@ -311,8 +341,7 @@
 
             if (!mat) { status.innerText = "Por favor, ingrese una matrícula válida."; return; }
 
-            // MODIFICACIÓN REQUERIDA: Mensaje plano, estático y limpio.
-            status.innerHTML = "<i class='fas fa-spinner fa-spin mr-2'></i>Buscando...";
+            status.innerHTML = "<i class='fas fa-spinner fa-spin mr-2'></i>Buscando en todos los niveles...";
 
             document.getElementById('reportCardExtra').style.display = 'none';
             document.getElementById('reportCardIngles').style.display = 'none';
@@ -321,7 +350,6 @@
             let dEx = null;
             let dIn = null;
 
-            // Bucle robusto con el recuperador CSV tradicional de Google que respeta las cabeceras intactas
             for (const pestañaActual of PESTANAS_SISTEMA) {
                 let textoNivelCompleto = pestañaActual.replace(/Kinder/i, 'Preescolar');
                 
@@ -344,8 +372,8 @@
         }
 
         async function obtenerDatosPorPestaña(sheetId, mat, nombrePestaña, textoNivelCompleto, tipo) {
-            // Volvemos al formato de exportación CSV directo que garantiza la integridad de la primera fila de materias
-            const url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&sheet=${encodeURIComponent(nombrePestaña)}&tqx=cb:${Date.now()}`;
+            // CORRECCIÓN CLAVE: Se implementa la query de visualización gviz/tq para que respete de manera estricta el parámetro &sheet
+            const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(nombrePestaña)}&tqx=cb:${Date.now()}`;
             try {
                 const res = await fetch(url);
                 if (!res.ok) return null; 
@@ -358,7 +386,6 @@
                 const materiasRow = data[0] || []; 
                 let studentRow = null;
 
-                // BÚSQUEDA EXACTA EN COLUMNA A A PARTIR DE FILA 3
                 for (let r = 2; r < data.length; r++) {
                     if (data[r] && data[r][0] !== undefined && data[r][0] !== null) {
                         const celdaMatricula = data[r][0].toString().trim().toUpperCase();
@@ -408,7 +435,7 @@
                     };
                 }
             } catch (e) { 
-                // Captura errores y permite continuar el bucle limpiamente
+                // Permite continuar el bucle limpiamente
             }
             return null;
         }
@@ -417,7 +444,7 @@
             const div = document.getElementById(`reportCard${idS}`);
             div.style.display = 'block';
             
-            const firmaCoordinacion = d.tipo === 'ingles' ? 'COORDINACIÓN DE INGLÉS' : 'COORDINACIÓN DE MATERIAS EXTRACURRICULARES';
+            const firmaCoordinacion = d.tipo === 'ingles' ? 'COORDINACIÓN DE INGLÉS' : 'COORDINACIÓN EXTRACURRICULAR';
             const clasePastel = obtenerClaseColor(d.nivel);
             const claseTituloColor = obtenerClaseClaseTitulo(d.nivel);
 
@@ -475,8 +502,14 @@
                 </div>
 
                 <div class="signature-section">
-                    <div class="sign-box">DIRECCIÓN GENERAL</div>
-                    <div class="sign-box">${firmaCoordinacion}</div>
+                    <div class="sign-container">
+                        <div class="sign-space"></div>
+                        <div class="sign-box">DIRECCIÓN GENERAL</div>
+                    </div>
+                    <div class="sign-container">
+                        <div class="sign-space"></div>
+                        <div class="sign-box">${firmaCoordinacion}</div>
+                    </div>
                 </div>
             `;
         }
