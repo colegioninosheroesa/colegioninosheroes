@@ -293,21 +293,21 @@
     <div id="reportCardIngles" class="report-card-container page-break"></div>
 
     <script>
-        // Rutas relativas a la carpeta raíz de tu repositorio en GitHub
         const RUTA_EXCEL_EXTRA = "Datos/BoletaExtracurriculares.xlsx";
         const RUTA_EXCEL_INGLES = "Datos/BoletaInglés.xlsx";
         
         let BASE_EXTRA_MEMORIA = {};
         let BASE_INGLES_MEMORIA = {};
 
+        // Convertimos a mayúsculas todo el mapa de validación para evitar fallos de case-sensitivity
         const MATERIAS_MAP = {
-            ingles: (n) => {
-                const nl = n.toUpperCase();
+            ingles: (nivelTexto) => {
+                const nl = (nivelTexto || "").toUpperCase();
                 if (nl.includes('MATERNAL') || nl.includes('KINDER') || nl.includes('PREESCOLAR')) return ['LISTENING', 'READING'];
                 return ['LISTENING', 'READING', 'WRITING', 'SPEAKING', 'COMPOSITION'];
             },
-            extra: (n) => {
-                const nl = n.toUpperCase();
+            extra: (nivelTexto) => {
+                const nl = (nivelTexto || "").toUpperCase();
                 if (nl.includes('MATERNAL') || nl.includes('KINDER') || nl.includes('PREESCOLAR')) return ['EDUCACIÓN FÍSICA', 'DANZA', 'MÚSICA', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMÁTICA', 'EMOCIONES'];
                 if (nl.includes('PRIMARIA 1') || nl.includes('PRIMARIA 2')) return ['EDUCACIÓN FÍSICA', 'DANZA', 'MÚSICA', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMÁTICA', 'JUEGOS Y DESTREZAS', 'ROBÓTICA', 'EDUCACIÓN FINANCIERA', 'SISTÉMICA', 'LECTURA', 'SPELLING BEE'];
                 if (nl.includes('PRIMARIA')) return ['EDUCACIÓN FÍSICA', 'DANZA', 'MÚSICA', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMÁTICA', 'JUEGOS Y DESTREZAS', 'ROBÓTICA', 'EDUCACIÓN FINANCIERA', 'SISTÉMICA'];
@@ -326,7 +326,6 @@
             const labelStatus = document.getElementById('loadStatus');
             const inputMat = document.getElementById('matriculaInput');
             try {
-                // Fetch automático desde las carpetas del servidor GitHub Pages
                 const [resExtra, resIngles] = await Promise.all([
                     fetch(RUTA_EXCEL_EXTRA),
                     fetch(RUTA_EXCEL_INGLES)
@@ -343,14 +342,14 @@
                 BASE_EXTRA_MEMORIA = parsearLibroExcel(bufExtra);
                 BASE_INGLES_MEMORIA = parsearLibroExcel(bufIngles);
 
-                labelStatus.innerHTML = "<span class='text-success'><i class='fas fa-check-circle mr-1'></i> Repositorio sincronizado en segundo plano correctamente.</span>";
+                labelStatus.innerHTML = "<span class='text-success'><i class='fas fa-check-circle mr-1'></i> Repositorio sincronizado correctamente.</span>";
                 inputMat.placeholder = "Ingrese la matrícula del alumno...";
                 document.getElementById('searchSection').style.opacity = "1";
                 document.getElementById('searchSection').style.pointerEvents = "auto";
 
             } catch (err) {
                 console.error(err);
-                labelStatus.innerHTML = `<span class='text-danger'><i class='fas fa-times-circle mr-1'></i> Error: Verifica que los archivos "${RUTA_EXCEL_EXTRA}" y "${RUTA_EXCEL_INGLES}" estén subidos en la raíz de tu GitHub.</span>`;
+                labelStatus.innerHTML = `<span class='text-danger'><i class='fas fa-times-circle mr-1'></i> Error al cargar datos. Revisa las rutas en tu carpeta 'Datos'.</span>`;
             }
         }
 
@@ -380,7 +379,7 @@
                         ciclo: studentRow[2],
                         grado: studentRow[3],
                         grupo: studentRow[4],
-                        nivel: sheetName.replace(/Kinder/i, 'Preescolar'),
+                        nivel: sheetName, // Guardamos el nombre tal cual viene de la pestaña
                         esPrepa: esPrepa,
                         materiasRow: materiasRow,
                         studentRow: studentRow
@@ -424,7 +423,7 @@
                     renderizarFilaExcel(alumnoIngles, 'Ingles', 'BOLETA DE INGLÉS', 'ingles');
                 }
             } else {
-                status.innerHTML = `<span class='text-danger'>La matrícula "${mat}" no se encuentra en el repositorio de GitHub.</span>`;
+                status.innerHTML = `<span class='text-danger'>La matrícula "${mat}" no se encuentra registrada.</span>`;
             }
         }
 
