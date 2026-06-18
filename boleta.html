@@ -111,7 +111,7 @@
             overflow: hidden;
         }
 
-        /* SELLO INSTITUCIONAL CENTRADO */
+        /* SELLO INSTITUCIONAL MARCA DE AGUA CENTRADO */
         .sello-agua-fondo {
             position: absolute;
             top: 55%;
@@ -150,7 +150,7 @@
 
         .boleta-title-box { text-align: center; margin-bottom: 25px; }
         
-        /* PALETAS DE COLOR TEMÁTICAS */
+        /* PALETAS DE COLOR TEMÁTICAS SEGÚN NIVEL */
         .bg-titulo-maternal { background-color: #FFF5B7 !important; color: #5d4037 !important; }
         .bg-titulo-preescolar { background-color: #FFB7CE !important; color: #4a148c !important; }
         .bg-titulo-primaria { background-color: #C1E7C4 !important; color: #1b5e20 !important; }
@@ -197,7 +197,7 @@
         .final-grade-label { font-weight: 800; text-transform: uppercase; color: #2C5282; margin-right: 15px; font-size: 0.85rem; }
         .final-grade-value { font-size: 1.7rem; font-weight: 900; color: #2B6CB0; line-height: 1; }
 
-        /* TABLAS */
+        /* TABLAS CON COLORES ARMÓNICOS */
         .grade-table-container { border-radius: 15px; overflow: hidden; border: 1px solid #E2E8F0; margin-bottom: 20px; }
         .grade-table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 0; }
         .grade-table thead th { font-weight: 800; text-transform: uppercase; font-size: 0.82rem; padding: 14px 10px; text-align: center; border: none; }
@@ -205,7 +205,7 @@
         .grade-table tbody tr td { padding: 14px 10px; text-align: center; font-weight: 700; font-size: 0.95rem; border: none; border-bottom: 1px solid rgba(0,0,0,0.04) !important; }
         .grade-table tbody tr td.subject-col { text-align: left; padding-left: 25px; font-weight: 800; }
 
-        /* COLORES TABLAS */
+        /* CONTROL DE TONOS DE TABLA SEGÚN NIVEL */
         .pastel-amarillo thead th { background-color: #FBC02D !important; color: #5d4037 !important; }
         .pastel-amarillo tbody tr td { background-color: #FFF9C4 !important; color: #5d4037 !important; }
         .pastel-amarillo tbody tr td.promedio-col { background-color: #FBC02D !important; font-weight: 900 !important; }
@@ -226,6 +226,7 @@
         .pastel-lila tbody tr td { background-color: #F3E5F5 !important; color: #4a148c !important; }
         .pastel-lila tbody tr td.promedio-col { background-color: #BA68C8 !important; font-weight: 900 !important; }
 
+        /* IMPRESIÓN */
         @media print {
             body { background-color: white !important; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
@@ -247,8 +248,8 @@
 
     <div class="hero-banner no-print">
         <div class="container">
-            <h1>Portal de Boletas Oficiales</h1>
-            <p>Introduce la matrícula del alumno para generar sus boletas institucionales.</p>
+            <h1>Portal de Boletas Oficiales (Local)</h1>
+            <p>Introduce la matrícula del alumno para consultar la información desde los archivos locales.</p>
         </div>
     </div>
 
@@ -270,15 +271,9 @@
     <div id="reportCardIngles" class="report-card-container page-break"></div>
 
     <script>
-        const idExtra = '12m7RYtCBAF-P6t8_hoS3TkJwVX0tHEf7uaHAs6m0pTs';
-        const idIngles = '1EY955TiJLZtpffxAtNQW3bjVuw8vHfYm_JYhX_6hXd4';
-
-        const PESTANAS_SISTEMA = [
-            "Maternal", "Kinder 1", "Kinder 2", "Kinder 3",
-            "Primaria 1", "Primaria 2", "Primaria 3", "Primaria 4", "Primaria 5", "Primaria 6",
-            "Secundaria 1", "Secundaria 2", "Secundaria 3",
-            "Preparatoria 1", "Preparatoria 2", "Preparatoria 3"
-        ];
+        // UBICACIÓN DE TUS ARCHIVOS LOCALES: Asegúrate de guardarlos en formato .csv en la carpeta "Datos"
+        const pathExtra = 'Datos/extra.csv';
+        const pathIngles = 'Datos/ingles.csv';
 
         const MATERIAS_MAP = {
             ingles: (n) => {
@@ -329,52 +324,48 @@
 
             if (!mat) { status.innerText = "Por favor, ingrese una matrícula válida."; return; }
 
-            status.innerHTML = "<i class='fas fa-spinner fa-spin mr-2'></i>Buscando en todos los niveles académicos...";
+            status.innerHTML = "<i class='fas fa-spinner fa-spin mr-2'></i>Buscando alumno en los archivos locales...";
 
             document.getElementById('reportCardExtra').style.display = 'none';
             document.getElementById('reportCardIngles').style.display = 'none';
             document.getElementById('printBtnContainer').style.display = 'none';
 
-            let dEx = null;
-            let dIn = null;
-
-            for (const pestañaActual of PESTANAS_SISTEMA) {
-                let textoNivelCompleto = pestañaActual.replace(/Kinder/i, 'Preescolar');
-                
-                let resEx = await obtenerDatosPorPestaña(idExtra, mat, pestañaActual, textoNivelCompleto, 'extra');
-                if (resEx) {
-                    dEx = resEx;
-                    dIn = await obtenerDatosPorPestaña(idIngles, mat, pestañaActual, textoNivelCompleto, 'ingles');
-                    break; 
-                }
-            }
+            // Consultar de manera simultánea y directa los archivos locales
+            let dEx = await obtenerDatosLocales(pathExtra, mat, 'extra');
+            let dIn = await obtenerDatosLocales(pathIngles, mat, 'ingles');
 
             if (dEx || dIn) {
-                status.innerHTML = "<span class='text-success'>¡Información cargada exitosamente!</span>";
+                status.innerHTML = "<span class='text-success'>¡Información local cargada exitosamente!</span>";
                 document.getElementById('printBtnContainer').style.display = 'block';
                 if (dEx) renderBoleta(dEx, 'Extra', 'ASIGNATURAS EXTRACURRICULARES');
                 if (dIn) renderBoleta(dIn, 'Ingles', 'BOLETA DE INGLÉS');
             } else {
-                status.innerHTML = `<span class='text-danger'>Matrícula "${mat}" no encontrada en ningún nivel. Verifique los caracteres.</span>`;
+                status.innerHTML = `<span class='text-danger'>Matrícula "${mat}" no encontrada en los registros locales. Verifique que el archivo CSV esté actualizado.</span>`;
             }
         }
 
-        async function obtenerDatosPorPestaña(sheetId, mat, nombrePestaña, textoNivelCompleto, tipo) {
-            const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(nombrePestaña)}&cb=${Date.now()}`;
+        function cargarCSV(path) {
+            return new Promise((resolve, reject) => {
+                Papa.parse(path, {
+                    download: true,
+                    header: false,
+                    skipEmptyLines: true,
+                    complete: (results) => resolve(results.data),
+                    error: (error) => reject(error)
+                });
+            });
+        }
+
+        async function obtenerDatosLocales(path, mat, tipo) {
             try {
-                const res = await fetch(url);
-                if (!res.ok) return null; 
-                
-                const csv = await res.text();
-                const data = Papa.parse(csv, {header: false, skipEmptyLines: true}).data;
-                
+                const data = await cargarCSV(path);
                 if (!data || data.length < 3) return null;
 
-                // CORRECCIÓN CENTRAL: Mapeo estricto del encabezado en la Fila 2 (Índice 1 de base 0)
+                // Fila 2 contiene los nombres de las asignaturas (Índice 1)
                 const materiasRow = data[1] || []; 
                 let studentRow = null;
 
-                // Empezamos la lectura estrictamente en la Fila 3 (Índice 2 de base 0) tal como se ve en tu captura
+                // Fila 3 en adelante contiene los alumnos (Índice 2)
                 for (let r = 2; r < data.length; r++) {
                     if (data[r] && data[r][0] !== undefined && data[r][0] !== null) {
                         const celdaMatricula = data[r][0].toString().trim().toUpperCase();
@@ -386,7 +377,11 @@
                 }
 
                 if (studentRow) {
-                    const esPrepa = nombrePestaña.toUpperCase().includes('PREPARATORIA');
+                    // Detectar nivel basado en el grado/pestaña guardada en la columna de Excel original
+                    let nivelDetectado = studentRow[3] ? studentRow[3].toString() : "Primaria";
+                    let textoNivelCompleto = nivelDetectado.replace(/Kinder/i, 'Preescolar');
+
+                    const esPrepa = textoNivelCompleto.toUpperCase().includes('PREPARATORIA');
                     const jump = esPrepa ? 3 : 4; 
                     const filtro = MATERIAS_MAP[tipo](textoNivelCompleto);
                     let listaMaterias = [];
@@ -423,7 +418,9 @@
                         materias: listaMaterias, pf, esPrepa, tipo
                     };
                 }
-            } catch (e) { }
+            } catch (e) {
+                console.error("Error al leer archivo local:", e);
+            }
             return null;
         }
 
