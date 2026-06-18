@@ -143,7 +143,7 @@
             position: relative;
         }
         .sello-dorado {
-            width: 150px; /* Ajustado el tamaño para que luzca mejor la firma/sello */
+            width: 150px; 
             height: auto;
             opacity: 0.95;
             mix-blend-mode: multiply;
@@ -290,7 +290,7 @@
         </div>
         
         <div class="text-center version-tag">
-            <i class="fas fa-code-branch mr-1"></i> Código actualizado: Versión del 18 de Junio de 2026 - 03:35 AM
+            <i class="fas fa-code-branch mr-1"></i> Código actualizado: Versión Estable del 18 de Junio de 2026
         </div>
         
         <div id="statusMsg" class="text-center mt-3 font-weight-bold"></div>
@@ -346,6 +346,7 @@
             "Preparatoria 3": "1196244263"
         };
 
+        // MATERIAS MAP COMPLETAMENTE EN MAYÚSCULAS Y CON ACENTOS CORREGIDOS
         const MATERIAS_MAP = {
             ingles: (n) => {
                 const nl = n.toUpperCase();
@@ -354,12 +355,12 @@
             },
             extra: (n) => {
                 const nl = n.toUpperCase();
-                if (nl.includes('MATERNAL') || nl.includes('KINDER') || nl.includes('PREESCOLAR')) return ['EDUCACIÓN FISÍCA', 'DANZA', 'MÚSICA', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMÁTICA', 'EMOCIONES'];
-                if (nl.includes('PRIMARIA 1') || nl.includes('PRIMARIA 2')) return ['EDUCACIÓN FISÍCA', 'DANZA', 'MÚSICA', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMÁTICA', 'JUEGOS Y DESTREZAS', 'ROBÓTICA', 'EDUCACIÓN FINANCIERA', 'SISTÉMICA', 'LECTURA', 'SPELLING BEE'];
-                if (nl.includes('PRIMARIA')) return ['EDUCACIÓN FISÍCA', 'DANZA', 'MÚSICA', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMÁTICA', 'JUEGOS Y DESTREZAS', 'ROBÓTICA', 'EDUCACIÓN FINANCIERA', 'SISTÉMICA'];
-                if (nl.includes('SECUNDARIA 2')) return ['EDUCACIÓN FISÍCA', 'DANZA', 'ARTES', 'MÚSICA', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMÁTICA', 'HERRAMIENTAS DIGITALES', 'AJEDREZ', 'ROBÓTICA', 'ORTOGRAFÍA', 'SISTÉMICA'];
-                if (nl.includes('SECUNDARIA')) return ['EDUCACIÓN FISÍCA', 'DANZA', 'ARTES', 'MÚSICA', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMÁTICA', 'HERRAMIENTAS DIGITALES', 'AJEDREZ', 'ROBÓTICA', 'SISTÉMICA'];
-                if (nl.includes('PREPARATORIA')) return ['EDUCACIÓN FISÍCA', 'DANZA', 'ARTES', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMÁTICA', 'HERRAMIENTAS DIGITALES', 'AJEDREZ', 'ROBÓTICA'];
+                if (nl.includes('MATERNAL') || nl.includes('KINDER') || nl.includes('PREESCOLAR')) return ['EDUCACIÓN FÍSICA', 'DANZA', 'MÚSICA', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMÁTICA', 'EMOCIONES'];
+                if (nl.includes('PRIMARIA 1') || nl.includes('PRIMARIA 2')) return ['EDUCACIÓN FÍSICA', 'DANZA', 'MÚSICA', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMÁTICA', 'JUEGOS Y DESTREZAS', 'ROBÓTICA', 'EDUCACIÓN FINANCIERA', 'SISTÉMICA', 'LECTURA', 'SPELLING BEE'];
+                if (nl.includes('PRIMARIA')) return ['EDUCACIÓN FÍSICA', 'DANZA', 'MÚSICA', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMÁTICA', 'JUEGOS Y DESTREZAS', 'ROBÓTICA', 'EDUCACIÓN FINANCIERA', 'SISTÉMICA'];
+                if (nl.includes('SECUNDARIA 2')) return ['EDUCACIÓN FÍSICA', 'DANZA', 'ARTES', 'MÚSICA', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMÁTICA', 'HERRAMIENTAS DIGITALES', 'AJEDREZ', 'ROBÓTICA', 'ORTOGRAFÍA', 'SISTÉMICA'];
+                if (nl.includes('SECUNDARIA')) return ['EDUCACIÓN FÍSICA', 'DANZA', 'ARTES', 'MÚSICA', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMÁTICA', 'HERRAMIENTAS DIGITALES', 'AJEDREZ', 'ROBÓTICA', 'SISTÉMICA'];
+                if (nl.includes('PREPARATORIA')) return ['EDUCACIÓN FÍSICA', 'DANZA', 'ARTES', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMÁTICA', 'HERRAMIENTAS DIGITALES', 'AJEDREZ', 'ROBÓTICA'];
                 return [];
             }
         };
