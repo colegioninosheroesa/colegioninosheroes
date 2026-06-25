@@ -427,122 +427,135 @@
             }
         }
 
-        function renderizarFilaExcel(alumno, idS, tituloFormateado, tipoMateria) {
-            const studentRow = alumno.studentRow;
-            const materiasRow = alumno.materiasRow;
-            const jump = alumno.esPrepa ? 3 : 4;
-            
-            const filtroOriginal = MATERIAS_MAP[tipoMateria](alumno.nivel);
-            const filtroNormalizado = filtroOriginal.map(m => normalizarTexto(m));
-            let listaMaterias = [];
+       function renderizarFilaExcel(alumno, idS, tituloFormateado, tipoMateria) {
+    const studentRow = alumno.studentRow;
+    const materiasRow = alumno.materiasRow;
+    const jump = alumno.esPrepa ? 3 : 4;
+    
+    const filtroOriginal = MATERIAS_MAP[tipoMateria](alumno.nivel);
+    const filtroNormalizado = filtroOriginal.map(m => normalizarTexto(m));
+    let listaMaterias = [];
 
-            for (let i = 5; i < studentRow.length; i += jump) {
-                if (materiasRow[i] && (materiasRow[i].toString().trim().toUpperCase().includes("CICLO") || materiasRow[i].toString().trim().toUpperCase().includes("PROMEDIO"))) {
-                    break;
-                }
+    // Cambiamos el límite superior para evitar desbordar los arreglos si vienen vacíos al final
+    const limiteColumnas = Math.min(studentRow.length, materiasRow.length);
 
-                let nombreMateriaCelda = materiasRow[i] ? materiasRow[i].toString().trim() : "";
-                let nombreMateriaNorm = normalizarTexto(nombreMateriaCelda);
+    for (let i = 5; i < limiteColumnas; i += jump) {
+        // Validación de seguridad para la celda actual
+        if (!materiasRow[i]) continue;
 
-                if (nombreMateriaNorm && filtroNormalizado.includes(nombreMateriaNorm)) {
-                    listaMaterias.push({
-                        n: nombreMateriaCelda.toUpperCase(),
-                        v1: fmt(studentRow[i]),             
-                        v2: fmt(studentRow[i+1]),           
-                        v3: alumno.esPrepa ? null : fmt(studentRow[i+2]), 
-                        vf: alumno.esPrepa ? fmt(studentRow[i+2]) : fmt(studentRow[i+3]) 
-                    });
-                }
-            }
+        let nombreMateriaCelda = materiasRow[i].toString().trim();
+        let nombreMateriaNorm = normalizarTexto(nombreMateriaCelda);
 
-            let pf = "-";
-            for (let k = studentRow.length - 1; k >= 5; k--) {
-                if (studentRow[k] !== undefined && studentRow[k] !== null && !isNaN(studentRow[k]) && studentRow[k].toString().trim() !== "") {
-                    pf = fmt(studentRow[k]);
-                    break;
-                }
-            }
-
-            const div = document.getElementById(`reportCard${idS}`);
-            div.style.display = 'block';
-            
-            const clasePastel = alumno.nivel ? (
-                alumno.nivel.toUpperCase().includes('MATERNAL') ? 'pastel-amarillo' :
-                alumno.nivel.toUpperCase().includes('KINDER') || alumno.nivel.toUpperCase().includes('PREESCOLAR') ? 'pastel-preescolar' :
-                alumno.nivel.toUpperCase().includes('PRIMARIA') ? 'pastel-verde' :
-                alumno.nivel.toUpperCase().includes('SECUNDARIA') ? 'pastel-azul' :
-                alumno.nivel.toUpperCase().includes('PREPARATORIA') ? 'pastel-lila' : ''
-            ) : '';
-
-            const claseTituloColor = alumno.nivel ? (
-                alumno.nivel.toUpperCase().includes('MATERNAL') ? 'bg-titulo-maternal' :
-                alumno.nivel.toUpperCase().includes('KINDER') || alumno.nivel.toUpperCase().includes('PREESCOLAR') ? 'bg-titulo-preescolar' :
-                alumno.nivel.toUpperCase().includes('PRIMARIA') ? 'bg-titulo-primaria' :
-                alumno.nivel.toUpperCase().includes('SECUNDARIA') ? 'bg-titulo-secundaria' :
-                alumno.nivel.toUpperCase().includes('PREPARATORIA') ? 'bg-titulo-prepa' : ''
-            ) : '';
-
-            div.innerHTML = `
-                <img src="Iconos/logo.png" class="sello-agua-fondo">
-                <div class="boleta-content-wrapper">
-                    <div class="header-boleta">
-                        <img src="Iconos/logo.png" class="logo-boleta">
-                        <div class="school-info">
-                            <h1 class="school-name">COLEGIO NIÑOS HÉROES</h1>
-                            <h2 class="school-subtitle">Sección Académica</h2>
-                            <p class="school-address">DURANGO S/N AMP. ADOLFO LÓPEZ MATEOS, ATIZAPÁN DE ZARAGOZA.<br>TELS: 58204881 Y 5590557078</p>
-                        </div>
-                    </div>
-
-                    <div class="boleta-title-box">
-                        <div class="boleta-title-text ${claseTituloColor}">${tituloFormateado}</div>
-                    </div>
-
-                    <div class="student-info-grid">
-                        <div class="info-item"><span class="info-label">Ciclo Escolar:</span> <span class="info-value">${alumno.ciclo || '-'}</span></div>
-                        <div class="info-item"><span class="info-label">Grado:</span> <span class="info-value">${alumno.grado || '-'}</span></div>
-                        <div class="info-item"><span class="info-label">Alumno:</span> <span class="info-value">${alumno.nombre || '-'}</span></div>
-                        <div class="info-item"><span class="info-label">Grupo:</span> <span class="info-value">${alumno.grupo || '-'}</span></div>
-                        
-                        <div class="final-grade-box">
-                            <span class="final-grade-label">Calificación Final General:</span>
-                            <span class="final-grade-value">${pf}</span>
-                        </div>
-                    </div>
-
-                    <p style="font-style: italic; font-size: 0.82rem; text-align: center; margin: 25px 0; color: #718096; padding: 0 30px; line-height: 1.4;">
-                        "La educación no solo forma estudiantes, forma seres humanos capaces de soñar en grande, de levantarse ante las dificultades y de construir con esfuerzo y valores el futuro que deseas alcanzar."
-                    </p>
-
-                    <div class="grade-table-container">
-                        <table class="grade-table ${clasePastel}">
-                            <thead>
-                                <tr>
-                                    <th class="subject-col">Materias</th>
-                                    ${alumno.esPrepa ? '<th>1er Sem</th><th>2do Sem</th>' : '<th>1er Trim</th><th>2do Trim</th><th>3er Trim</th>'}
-                                    <th>Promedio Final</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${listaMaterias.map(m => `
-                                    <tr>
-                                        <td class="subject-col">${m.n}</td>
-                                        <td>${m.v1}</td>
-                                        <td>${m.v2}</td>
-                                        ${!alumno.esPrepa ? `<td>${m.v3}</td>` : ''}
-                                        <td class="promedio-col">${m.vf}</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="contenedor-sello-dorado">
-                        <img src="Iconos/sello.png" class="sello-dorado">
-                    </div>
-                </div>
-            `;
+        // Si la celda contiene palabras de control o promedios generales intermedios, la saltamos de forma segura
+        if (nombreMateriaNorm.includes("CICLO") || nombreMateriaNorm === "PROMEDIO" || nombreMateriaNorm === "PROMEDIO FINAL") {
+            continue;
         }
+
+        // Comprobamos si la materia pertenece al filtro del nivel académico
+        if (nombreMateriaNorm && filtroNormalizado.includes(nombreMateriaNorm)) {
+            listaMaterias.push({
+                n: nombreMateriaCelda.toUpperCase(),
+                v1: fmt(studentRow[i]),             
+                v2: fmt(studentRow[i+1]),           
+                v3: alumno.esPrepa ? null : fmt(studentRow[i+2]), 
+                vf: alumno.esPrepa ? fmt(studentRow[i+2]) : fmt(studentRow[i+3]) 
+            });
+        }
+    }
+
+    // Calcular u obtener la calificación final general (último valor numérico del registro)
+    let pf = "-";
+    for (let k = studentRow.length - 1; k >= 5; k--) {
+        if (studentRow[k] !== undefined && studentRow[k] !== null && !isNaN(studentRow[k]) && studentRow[k].toString().trim() !== "") {
+            pf = fmt(studentRow[k]);
+            break;
+        }
+    }
+
+    const div = document.getElementById(`reportCard${idS}`);
+    div.style.display = 'block';
+    
+    const clasePastel = alumno.nivel ? (
+        alumno.nivel.toUpperCase().includes('MATERNAL') ? 'pastel-amarillo' :
+        alumno.nivel.toUpperCase().includes('KINDER') || alumno.nivel.toUpperCase().includes('PREESCOLAR') ? 'pastel-preescolar' :
+        alumno.nivel.toUpperCase().includes('PRIMARIA') ? 'pastel-verde' :
+        alumno.nivel.toUpperCase().includes('SECUNDARIA') ? 'pastel-azul' :
+        alumno.nivel.toUpperCase().includes('PREPARATORIA') ? 'pastel-lila' : ''
+    ) : '';
+
+    const claseTituloColor = alumno.nivel ? (
+        alumno.nivel.toUpperCase().includes('MATERNAL') ? 'bg-titulo-maternal' :
+        alumno.nivel.toUpperCase().includes('KINDER') || alumno.nivel.toUpperCase().includes('PREESCOLAR') ? 'bg-titulo-preescolar' :
+        alumno.nivel.toUpperCase().includes('PRIMARIA') ? 'bg-titulo-primaria' :
+        alumno.nivel.toUpperCase().includes('SECUNDARIA') ? 'bg-titulo-secundaria' :
+        alumno.nivel.toUpperCase().includes('PREPARATORIA') ? 'bg-titulo-prepa' : ''
+    ) : '';
+
+    div.innerHTML = `
+        <img src="Iconos/logo.png" class="sello-agua-fondo">
+        <div class="boleta-content-wrapper">
+            <div class="header-boleta">
+                <img src="Iconos/logo.png" class="logo-boleta">
+                <div class="school-info">
+                    <h1 class="school-name">COLEGIO NIÑOS HÉROES</h1>
+                    <h2 class="school-subtitle">Sección Académica</h2>
+                    <p class="school-address">DURANGO S/N AMP. ADOLFO LÓPEZ MATEOS, ATIZAPÁN DE ZARAGOZA.<br>TELS: 58204881 Y 5590557078</p>
+                </div>
+            </div>
+
+            <div class="boleta-title-box">
+                <div class="boleta-title-text ${claseTituloColor}">${tituloFormateado}</div>
+            </div>
+
+            <div class="student-info-grid">
+                <div class="info-item"><span class="info-label">Ciclo Escolar:</span> <span class="info-value">${alumno.ciclo || '-'}</span></div>
+                <div class="info-item"><span class="info-label">Grado:</span> <span class="info-value">${alumno.grado || '-'}</span></div>
+                <div class="info-item"><span class="info-label">Alumno:</span> <span class="info-value">${alumno.nombre || '-'}</span></div>
+                <div class="info-item"><span class="info-label">Grupo:</span> <span class="info-value">${alumno.grupo || '-'}</span></div>
+                
+                <div class="final-grade-box">
+                    <span class="final-grade-label">Calificación Final General:</span>
+                    <span class="final-grade-value">${pf}</span>
+                </div>
+            </div>
+
+            <p style="font-style: italic; font-size: 0.82rem; text-align: center; margin: 25px 0; color: #718096; padding: 0 30px; line-height: 1.4;">
+                "La educación no solo forma estudiantes, forma seres humanos capaces de soñar en grande, de levantarse ante las dificultades y de construir con esfuerzo y valores el futuro que deseas alcanzar."
+            </p>
+
+            <div class="grade-table-container">
+                <table class="grade-table ${clasePastel}">
+                    <thead>
+                        <tr>
+                            <th class="subject-col">Materias</th>
+                            ${alumno.esPrepa ? '<th>1er Sem</th><th>2do Sem</th>' : '<th>1er Trim</th><th>2do Trim</th><th>3er Trim</th>'}
+                            <th>Promedio Final</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${listaMaterias.length === 0 ? `
+                            <tr>
+                                <td colspan="${alumno.esPrepa ? 4 : 5}" class="text-center text-muted">No se encontraron materias que coincidan con este nivel académico.</td>
+                            </tr>
+                        ` : listaMaterias.map(m => `
+                            <tr>
+                                <td class="subject-col">${m.n}</td>
+                                <td>${m.v1}</td>
+                                <td>${m.v2}</td>
+                                ${!alumno.esPrepa ? `<td>${m.v3}</td>` : ''}
+                                <td class="promedio-col">${m.vf}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="contenedor-sello-dorado">
+                <img src="Iconos/sello.png" class="sello-dorado">
+            </div>
+        </div>
+    `;
+}
     </script>
 </body>
 </html>
