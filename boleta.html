@@ -278,7 +278,7 @@
         </div>
         
         <div class="text-center version-tag" id="loadStatus">
-            <i class="fas fa-spinner fa-spin mr-1"></i> Sincronizando archivos.
+            <i class="fas fa-spinner fa-spin mr-1"></i> Sincronizando archivos. 346
         </div>
         
         <div id="statusMsg" class="text-center mt-3 font-weight-bold"></div>
@@ -432,26 +432,31 @@
     const materiasRow = alumno.materiasRow;
     const jump = alumno.esPrepa ? 3 : 4;
     
+    // --- BLOQUE DE DIAGNÓSTICO EN CONSOLA ---
+    console.log(`=== DIAGNÓSTICO PARA: ${tituloFormateado} ===`);
+    console.log("Nombre de la pestaña (nivel detectado):", alumno.nivel);
+    
     const filtroOriginal = MATERIAS_MAP[tipoMateria](alumno.nivel);
+    console.log("Materias esperadas para este nivel (según tu MATERIAS_MAP):", filtroOriginal);
+    
     const filtroNormalizado = filtroOriginal.map(m => normalizarTexto(m));
     let listaMaterias = [];
 
-    // Cambiamos el límite superior para evitar desbordar los arreglos si vienen vacíos al final
     const limiteColumnas = Math.min(studentRow.length, materiasRow.length);
 
     for (let i = 5; i < limiteColumnas; i += jump) {
-        // Validación de seguridad para la celda actual
         if (!materiasRow[i]) continue;
 
         let nombreMateriaCelda = materiasRow[i].toString().trim();
         let nombreMateriaNorm = normalizarTexto(nombreMateriaCelda);
 
-        // Si la celda contiene palabras de control o promedios generales intermedios, la saltamos de forma segura
         if (nombreMateriaNorm.includes("CICLO") || nombreMateriaNorm === "PROMEDIO" || nombreMateriaNorm === "PROMEDIO FINAL") {
             continue;
         }
 
-        // Comprobamos si la materia pertenece al filtro del nivel académico
+        // Imprime cada materia que encuentra en el Excel y su versión limpia para comparar
+        console.log(`Columna ${i} - Encontrado en Excel: "${nombreMateriaCelda}" | ¿Está en el filtro?:`, filtroNormalizado.includes(nombreMateriaNorm));
+
         if (nombreMateriaNorm && filtroNormalizado.includes(nombreMateriaNorm)) {
             listaMaterias.push({
                 n: nombreMateriaCelda.toUpperCase(),
@@ -462,8 +467,10 @@
             });
         }
     }
+    console.log("Total de materias que pasaron el filtro y se van a dibujar:", listaMaterias.length);
+    console.log("========================================");
+    // --- FIN DEL BLOQUE DE DIAGNÓSTICO ---
 
-    // Calcular u obtener la calificación final general (último valor numérico del registro)
     let pf = "-";
     for (let k = studentRow.length - 1; k >= 5; k--) {
         if (studentRow[k] !== undefined && studentRow[k] !== null && !isNaN(studentRow[k]) && studentRow[k].toString().trim() !== "") {
@@ -535,7 +542,10 @@
                     <tbody>
                         ${listaMaterias.length === 0 ? `
                             <tr>
-                                <td colspan="${alumno.esPrepa ? 4 : 5}" class="text-center text-muted">No se encontraron materias que coincidan con este nivel académico.</td>
+                                <td colspan="${alumno.esPrepa ? 4 : 5}" class="text-center text-muted" style="padding: 20px; background: #fff;">
+                                    No se encontraron materias que coincidan con el filtro de tu código. <br>
+                                    <small class="text-danger">Abre la Consola del Desarrollador (F12) para ver la causa exacta.</small>
+                                </td>
                             </tr>
                         ` : listaMaterias.map(m => `
                             <tr>
