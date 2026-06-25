@@ -278,7 +278,7 @@
         </div>
         
         <div class="text-center version-tag" id="loadStatus">
-            <i class="fas fa-spinner fa-spin mr-1"></i> Sincronizando archivos. 413
+            <i class="fas fa-spinner fa-spin mr-1"></i> Sincronizando archivos. 419
         </div>
         
         <div id="statusMsg" class="text-center mt-3 font-weight-bold"></div>
@@ -363,9 +363,11 @@
                 
                 if (rows.length < 3) return;
 
-                const materiasRow = rows[1];
+                // CORRECCIÓN AQUÍ: rows[0] apunta a la Fila 1 de Excel (donde están los nombres reales de las materias)
+                const materiasRow = rows[0];
                 const esPrepa = sheetName.toUpperCase().includes('PREPARATORIA');
 
+                // Las calificaciones de los alumnos inician en la Fila 3 de Excel (índice 2)
                 for (let r = 2; r < rows.length; r++) {
                     const studentRow = rows[r];
                     if (!studentRow[0]) continue;
@@ -442,7 +444,7 @@
 
             const limiteColumnas = Math.max(studentRow.length, materiasRow.length);
 
-            // Recorremos celda por celda desde la columna F (índice 5)
+            // Recorremos desde la columna F (índice 5)
             for (let i = 5; i < limiteColumnas; i++) {
                 if (!materiasRow[i] || materiasRow[i].toString().trim() === "") continue;
 
@@ -455,7 +457,6 @@
 
                 console.log(`Columna ${i} - Encontrado en Excel: "${nombreMateriaCelda}"`);
 
-                // Si el filtro está vacío (por inconsistencia de nombres de pestaña) o si coincide explícitamente
                 if (filtroNormalizado.length === 0 || filtroNormalizado.includes(nombreMateriaNorm)) {
                     
                     let v1 = fmt(studentRow[i]);       // T1 o S1
@@ -471,9 +472,7 @@
                         vf: vf 
                     });
                     
-                    // Si es Prepa el bloque mide 3 columnas (i, i+1, i+2); sumamos 2 al índice 'i'.
-                    // Si es otro nivel el bloque mide 4 columnas (i, i+1, i+2, i+3); sumamos 3.
-                    // Al finalizar la vuelta actual, el 'i++' del ciclo for lo colocará exactamente en la siguiente materia.
+                    // Salto adaptativo corregido: 2 columnas extras para Prepa, 3 para los demás niveles
                     i += (alumno.esPrepa ? 2 : 3);
                 }
             }
@@ -576,6 +575,6 @@
                 </div>
             `;
         }
-    </script>
+</script>
 </body>
 </html>
