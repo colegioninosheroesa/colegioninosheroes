@@ -278,7 +278,7 @@
         </div>
         
         <div class="text-center version-tag" id="loadStatus">
-            <i class="fas fa-spinner fa-spin mr-1"></i> Sincronizando archivos. 411
+            <i class="fas fa-spinner fa-spin mr-1"></i> Sincronizando archivos. 413
         </div>
         
         <div id="statusMsg" class="text-center mt-3 font-weight-bold"></div>
@@ -291,8 +291,7 @@
 
     <div id="reportCardExtra" class="report-card-container"></div>
     <div id="reportCardIngles" class="report-card-container page-break"></div>
-
-    <script>
+<script>
         const RUTA_EXCEL_EXTRA = "Datos/BoletaExtracurriculares.xlsx";
         const RUTA_EXCEL_INGLES = "Datos/BoletaInglés.xlsx";
         
@@ -354,79 +353,115 @@
         }
 
         function parsearLibroExcel(arrayBuffer) {
-    const data = new Uint8Array(arrayBuffer);
-    const workbook = XLSX.read(data, { type: 'array' });
-    let mapeoTemporal = {};
+            const data = new Uint8Array(arrayBuffer);
+            const workbook = XLSX.read(data, { type: 'array' });
+            let mapeoTemporal = {};
 
-    workbook.SheetNames.forEach(sheetName => {
-        const worksheet = workbook.Sheets[sheetName];
-        const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-        
-        if (rows.length < 3) return;
+            workbook.SheetNames.forEach(sheetName => {
+                const worksheet = workbook.Sheets[sheetName];
+                const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                
+                if (rows.length < 3) return;
 
-        // CORRECCIÓN AQUÍ: rows[0] es la fila 1 de Excel (donde están los nombres de las materias)
-        const materiasRow = rows[0];
-        const esPrepa = sheetName.toUpperCase().includes('PREPARATORIA');
+                const materiasRow = rows[1];
+                const esPrepa = sheetName.toUpperCase().includes('PREPARATORIA');
 
-        // Los alumnos y calificaciones empiezan a partir de la fila 3 de Excel (índice 2)
-        for (let r = 2; r < rows.length; r++) {
-            const studentRow = rows[r];
-            if (!studentRow[0]) continue;
+                for (let r = 2; r < rows.length; r++) {
+                    const studentRow = rows[r];
+                    if (!studentRow[0]) continue;
 
-            const matricula = studentRow[0].toString().trim().toUpperCase();
+                    const matricula = studentRow[0].toString().trim().toUpperCase();
 
-            mapeoTemporal[matricula] = {
-                nombre: studentRow[1],
-                matricula: matricula,
-                ciclo: studentRow[2],
-                grado: studentRow[3],
-                grupo: studentRow[4],
-                nivel: sheetName, 
-                esPrepa: esPrepa,
-                materiasRow: materiasRow,
-                studentRow: studentRow
-            };
-        }
-    });
-    return mapeoTemporal;
-}
-
-function renderizarFilaExcel(alumno, idS, tituloFormateado, tipoMateria) {
-    const studentRow = alumno.studentRow;
-    const materiasRow = alumno.materiasRow;
-    
-    // --- BLOQUE DE DIAGNÓSTICO EN CONSOLA ---
-    console.log(`=== DIAGNÓSTICO PARA: ${tituloFormateado} ===`);
-    console.log("Nombre de la pestaña (nivel detectado):", alumno.nivel);
-    
-    const filtroOriginal = MATERIAS_MAP[tipoMateria](alumno.nivel);
-    console.log("Materias esperadas para este nivel (según tu MATERIAS_MAP):", filtroOriginal);
-    
-    const filtroNormalizado = filtroOriginal.map(m => normalizarTexto(m));
-    let listaMaterias = [];
-
-    const limiteColumnas = Math.max(studentRow.length, materiasRow.length);
-
-    // Recorremos celda por celda desde la columna F (índice 5 de JavaScript)
-    for (let i = 5; i < limiteColumnas; i++) {
-        if (!materiasRow[i] || materiasRow[i].toString().trim() === "") continue;
-
-        let nombreMateriaCelda = materiasRow[i].toString().trim();
-        let nombreMateriaNorm = normalizarTexto(nombreMateriaCelda);
-
-        if (nombreMateriaNorm.includes("CICLO") || nombreMateriaNorm === "PROMEDIO" || nombreMateriaNorm === "PROMEDIO FINAL") {
-            continue;
+                    mapeoTemporal[matricula] = {
+                        nombre: studentRow[1],
+                        matricula: matricula,
+                        ciclo: studentRow[2],
+                        grado: studentRow[3],
+                        grupo: studentRow[4],
+                        nivel: sheetName, 
+                        esPrepa: esPrepa,
+                        materiasRow: materiasRow,
+                        studentRow: studentRow
+                    };
+                }
+            });
+            return mapeoTemporal;
         }
 
-        console.log(`Columna ${i} - Encontrado en Excel: "${nombreMateriaCelda}"`);
+        function normalizarTexto(texto) {
+            if (!texto) return "";
+            return texto.toString().trim().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        }
 
-        // Si el filtro está vacío o si coincide explícitamente con la materia
-        if (filtroNormalizado.length === 0 || filtroNormalizado.includes(nombreMateriaNorm)) {
+        const fmt = (v) => {
+            if (v === undefined || v === null || v === "" || isNaN(v)) return '-';
+            return (Math.floor(parseFloat(v) * 10) / 10).toFixed(1);
+        };
+
+        function buscarBoletasExcel() {
+            const mat = document.getElementById('matriculaInput').value.trim().toUpperCase();
+            const status = document.getElementById('statusMsg');
+
+            if (!mat) { status.innerText = "Por favor, ingrese una matrícula válida."; return; }
+
+            document.getElementById('reportCardExtra').style.display = 'none';
+            document.getElementById('reportCardIngles').style.display = 'none';
+            document.getElementById('printBtnContainer').style.display = 'none';
+
+            const alumnoExtra = BASE_EXTRA_MEMORIA[mat];
+            const alumnoIngles = BASE_INGLES_MEMORIA[mat];
+
+            if (alumnoExtra || alumnoIngles) {
+                status.innerHTML = "<span class='text-success'>¡Información cargada con éxito!</span>";
+                document.getElementById('printBtnContainer').style.display = 'block';
+
+                if (alumnoExtra) {
+                    renderizarFilaExcel(alumnoExtra, 'Extra', 'ASIGNATURAS EXTRACURRICULARES', 'extra');
+                }
+                if (alumnoIngles) {
+                    renderizarFilaExcel(alumnoIngles, 'Ingles', 'BOLETA DE INGLÉS', 'ingles');
+                }
+            } else {
+                status.innerHTML = `<span class='text-danger'>La matrícula "${mat}" no se encuentra registrada.</span>`;
+            }
+        }
+
+        function renderizarFilaExcel(alumno, idS, tituloFormateado, tipoMateria) {
+            const studentRow = alumno.studentRow;
+            const materiasRow = alumno.materiasRow;
             
-            let v1 = fmt(studentRow[i]);       // T1 o S1
-            let v2 = fmt(studentRow[i+1]);     // T2 o S2
-            let v3 = alumno.esPrepa ? null : fmt(studentRow[i+2]);  // T3 (Solo si no es Prepa)
-            let vf = alumno.esPrepa ? fmt(studentRow[i+2]) : fmt(studentRow[i+3]); // PF
+            // --- BLOQUE DE DIAGNÓSTICO EN CONSOLA ---
+            console.log(`=== DIAGNÓSTICO PARA: ${tituloFormateado} ===`);
+            console.log("Nombre de la pestaña (nivel detectado):", alumno.nivel);
+            
+            const filtroOriginal = MATERIAS_MAP[tipoMateria](alumno.nivel);
+            console.log("Materias esperadas para este nivel (según tu MATERIAS_MAP):", filtroOriginal);
+            
+            const filtroNormalizado = filtroOriginal.map(m => normalizarTexto(m));
+            let listaMaterias = [];
+
+            const limiteColumnas = Math.max(studentRow.length, materiasRow.length);
+
+            // Recorremos celda por celda desde la columna F (índice 5)
+            for (let i = 5; i < limiteColumnas; i++) {
+                if (!materiasRow[i] || materiasRow[i].toString().trim() === "") continue;
+
+                let nombreMateriaCelda = materiasRow[i].toString().trim();
+                let nombreMateriaNorm = normalizarTexto(nombreMateriaCelda);
+
+                if (nombreMateriaNorm.includes("CICLO") || nombreMateriaNorm === "PROMEDIO" || nombreMateriaNorm === "PROMEDIO FINAL") {
+                    continue;
+                }
+
+                console.log(`Columna ${i} - Encontrado en Excel: "${nombreMateriaCelda}"`);
+
+                // Si el filtro está vacío (por inconsistencia de nombres de pestaña) o si coincide explícitamente
+                if (filtroNormalizado.length === 0 || filtroNormalizado.includes(nombreMateriaNorm)) {
+                    
+                    let v1 = fmt(studentRow[i]);       // T1 o S1
+                    let v2 = fmt(studentRow[i+1]);     // T2 o S2
+                    let v3 = alumno.esPrepa ? null : fmt(studentRow[i+2]);  // T3 (Solo si no es Prepa)
+                    let vf = alumno.esPrepa ? fmt(studentRow[i+2]) : fmt(studentRow[i+3]); // PF
 
                     listaMaterias.push({
                         n: nombreMateriaCelda.toUpperCase(),
@@ -436,7 +471,9 @@ function renderizarFilaExcel(alumno, idS, tituloFormateado, tipoMateria) {
                         vf: vf 
                     });
                     
-                    // Si es Prepa salta 2 columnas, si es básico salta 3 columnas adicionales
+                    // Si es Prepa el bloque mide 3 columnas (i, i+1, i+2); sumamos 2 al índice 'i'.
+                    // Si es otro nivel el bloque mide 4 columnas (i, i+1, i+2, i+3); sumamos 3.
+                    // Al finalizar la vuelta actual, el 'i++' del ciclo for lo colocará exactamente en la siguiente materia.
                     i += (alumno.esPrepa ? 2 : 3);
                 }
             }
