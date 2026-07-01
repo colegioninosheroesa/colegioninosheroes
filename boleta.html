@@ -275,7 +275,7 @@
         @media print {
             body { background-color: white !important; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            .no-print, .hero-banner, .search-container, .navbar { display: none !important; }
+            .no-print, .hero-banner, .search-container, .navbar, .hero { display: none !important; }
             .report-card-container { display: block !important; border: none; box-shadow: none; padding: 0; margin: 0; width: 100%; max-width: 100%; border-radius: 0; }
             .header-boleta { margin: 0 0 30px 0; padding: 20px 0; }
             .page-break { page-break-before: always; }
@@ -423,6 +423,16 @@
             return texto.toString().trim().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
         }
 
+        function obtenerNivelEducativoFormateado(nivelTexto) {
+            const nl = (nivelTexto || "").toUpperCase();
+            if (nl.includes('MATERNAL')) return 'Maternal';
+            if (nl.includes('KINDER') || nl.includes('PREESCOLAR')) return 'Preescolar';
+            if (nl.includes('PRIMARIA')) return 'Primaria';
+            if (nl.includes('SECUNDARIA')) return 'Secundaria';
+            if (nl.includes('PREPARATORIA') || nl.includes('PREPA')) return 'Bachillerato';
+            return nivelTexto;
+        }
+
         const fmt = (v) => {
             if (v === undefined || v === null || v === "" || isNaN(v)) return '-';
             return (Math.floor(parseFloat(v) * 10) / 10).toFixed(1);
@@ -557,8 +567,9 @@
                 alumno.nivel.toUpperCase().includes('PREPARATORIA') ? 'bg-titulo-prepa' : ''
             ) : '';
 
-            // Obtener nombres de las firmas dinámicas
+            // Obtener nombres de las firmas dinámicas y limpiar el texto del nivel educativo
             const firmas = obtenerFirmasPorNivel(alumno.nivel);
+            const nivelLimpio = obtenerNivelEducativoFormateado(alumno.nivel);
 
             div.innerHTML = `
                 <img src="Iconos/logo.png" class="sello-agua-fondo">
@@ -578,7 +589,7 @@
 
                     <div class="student-info-grid">
                         <div class="info-item"><span class="info-label">Ciclo Escolar:</span> <span class="info-value">${alumno.ciclo || '-'}</span></div>
-                        <div class="info-item"><span class="info-label">Nivel Educativo:</span> <span class="info-value" style="text-transform: uppercase;">${alumno.nivel || '-'}</span></div>
+                        <div class="info-item"><span class="info-label">Nivel Educativo:</span> <span class="info-value" style="text-transform: uppercase;">${nivelLimpio}</span></div>
                         <div class="info-item"><span class="info-label">Alumno:</span> <span class="info-value">${alumno.nombre || '-'}</span></div>
                         <div class="info-item"><span class="info-label">Grado y Grupo:</span> <span class="info-value">${alumno.grado || '-'} "${alumno.grupo || '-'}"</span></div>
                         
