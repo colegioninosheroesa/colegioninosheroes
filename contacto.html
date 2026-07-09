@@ -8,12 +8,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     
-    <!-- SOLUCIÓN DEFINITIVA: Código nativo de EmailJS incrustado (sin depender de enlaces externos) -->
-    <script>
-        !function(){"use strict";var e={d:function(t,n){for(var r in n)e.o(n,r)&&!e.o(t,r)&&Object.defineProperty(t,r,{enumerable:true,get:n[r]})},o:function(e,t){return Object.prototype.hasOwnProperty.call(e,t)}};const t=new class{constructor(){this._initParams={}}init(e,t="https://api.emailjs.com"){this._initParams={publicKey:e,apiHost:t}}send(e,t,n,r){const o=r||this._initParams.publicKey,a=this._initParams.apiHost;if(!o)throw"The public key is required.";return async function(e,t,n,r){const o=await fetch(`${r}/api/v1.0/email/send`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({service_id:e,template_id:t,template_params:n,user_id:r})});if(!o.ok){const e=await o.text();throw e}return o}(e,t,n,o,a)}};window.emailjs=t}();
-        
-        // Inicializamos con tus credenciales
-        emailjs.init("UDHsuooPGC3Jp2aIK");
+    <!-- Cargamos la librería oficial mediante un CDN alternativo de alta compatibilidad -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/min.js"></script>
+    <script type="text/javascript">
+        (function(){
+            emailjs.init({
+                publicKey: "UDHsuooPGC3Jp2aIK",
+            });
+        })();
     </script>
 
     <style>
@@ -274,7 +276,7 @@
 
     <script>
         document.getElementById('contactForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Detiene el envío clásico por URL
+            event.preventDefault(); // Evitamos que refresque la pantalla y ensucie la URL
 
             const btn = document.querySelector('.btn-institucional');
             btn.textContent = 'ENVIANDO...';
@@ -291,6 +293,7 @@
                 tutor_whatsapp: event.target.tutor_whatsapp.value
             };
 
+            // Mandar los datos directo a la API global oficial de EmailJS
             emailjs.send('service_3jecg3c', 'template_2l6natq', templateParams)
                 .then(function() {
                     alert('¡Solicitud de informes enviada con éxito! Nos comunicaremos pronto.');
