@@ -83,11 +83,9 @@
             color: white !important;
             font-weight: 800 !important;
             text-transform: uppercase;
-            /* Esto lo pone en MAYÚSCULAS como en Oferta */
             padding: 8px 20px !important;
             border-radius: 8px !important;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-            /* La sombra que le falta a Comunidad */
             transition: 0.3s;
             display: inline-flex;
             align-items: center;
@@ -96,20 +94,17 @@
         .btn-whatsapp-custom:hover {
             background-color: #2e963d !important;
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-            /* Sombra más fuerte al pasar el mouse */
             transform: translateY(-1px);
             color: white !important;
         }
 
         .btn-whatsapp-custom i {
             margin-right: 8px;
-            /* Espacio entre el icono y el texto */
         }
 
         /* Botón de WhatsApp Estilo Limpio (Igual a Oferta Educativa) */
         .btn-whatsapp-nav {
             background-color: #38b44a !important;
-            /* El verde exacto de la imagen */
             border-color: #38b44a !important;
             color: white !important;
             font-weight: 700 !important;
@@ -127,7 +122,6 @@
             background-color: #2e963d !important;
             text-decoration: none !important;
             transform: none;
-            /* Quitamos el salto para que sea serio */
         }
 
         .btn-whatsapp-nav i {
@@ -178,8 +172,7 @@
 <body>
     <div class="top-bar d-none d-md-block">
         <div class="container d-flex justify-content-between align-items-center">
-            <div><i class="fas fa-envelope mr-1"></i> cnh.admi@hotmail.com | 55 5820 4881 - 55 9055 7078
-</div>
+            <div><i class="fas fa-envelope mr-1"></i> cnh.admi@hotmail.com | 55 5820 4881 - 55 9055 7078</div>
             <div><a href="#" style="color:white;"><i class="fab fa-facebook-f"></i></a></div>
         </div>
     </div>
@@ -216,20 +209,17 @@
 
     <section class="container mt-5 mb-5">
         <div class="form-container bg-white p-5 shadow-sm">
-            <form action="https://formspree.io/f/xzdydopz" method="POST">
+            <form id="contactForm">
 
-                <h4
-                    style="color: #193E9A; margin-bottom: 25px; font-weight: 800; text-transform: uppercase; font-size: 1.2rem;">
+                <h4 style="color: #193E9A; margin-bottom: 25px; font-weight: 800; text-transform: uppercase; font-size: 1.2rem;">
                     <i class="fas fa-user-graduate mr-2"></i>Información del Alumno
                 </h4>
                 <div class="row">
                     <div class="col-md-6">
-                        <input type="text" name="alumno_nombre" class="form-control"
-                            placeholder="Nombre(s) del alumno *" required>
+                        <input type="text" name="alumno_nombre" class="form-control" placeholder="Nombre(s) del alumno *" required>
                     </div>
                     <div class="col-md-3">
-                        <input type="text" name="alumno_apellido_p" class="form-control" placeholder="Primer apellido *"
-                            required>
+                        <input type="text" name="alumno_apellido_p" class="form-control" placeholder="Primer apellido *" required>
                     </div>
                     <div class="col-md-3">
                         <input type="text" name="alumno_apellido_m" class="form-control" placeholder="Segundo apellido">
@@ -260,27 +250,20 @@
                     </div>
                 </div>
 
-                <h4 class="mt-5"
-                    style="color: #193E9A; margin-bottom: 25px; font-weight: 800; text-transform: uppercase; font-size: 1.2rem;">
+                <h4 class="mt-5" style="color: #193E9A; margin-bottom: 25px; font-weight: 800; text-transform: uppercase; font-size: 1.2rem;">
                     <i class="fas fa-user-friends mr-2"></i>Datos del Padre o Tutor
                 </h4>
                 <div class="row">
                     <div class="col-md-6">
-                        <input type="text" name="tutor_nombre" class="form-control"
-                            placeholder="Nombre completo del tutor *" required>
+                        <input type="text" name="tutor_nombre" class="form-control" placeholder="Nombre completo del tutor *" required>
                     </div>
                     <div class="col-md-6">
-                        <input type="email" name="tutor_email" class="form-control"
-                            placeholder="Correo electrónico de contacto *" required>
+                        <input type="email" name="tutor_email" class="form-control" placeholder="Correo electrónico de contacto *" required>
                     </div>
                     <div class="col-md-12 mt-2">
-                        <input type="tel" name="tutor_whatsapp" class="form-control"
-                            placeholder="Número de WhatsApp (10 dígitos) *" required>
+                        <input type="tel" name="tutor_whatsapp" class="form-control" placeholder="Número de WhatsApp (10 dígitos) *" required>
                     </div>
                 </div>
-
-                <input type="hidden" name="_subject" value="Nueva Solicitud de Informes - Colegio Niños Héroes">
-                <input type="hidden" name="_language" value="es">
 
                 <button type="submit" class="btn-institucional mt-4">Enviar Solicitud de Información</button>
             </form>
@@ -302,10 +285,52 @@
                 </div>
             </div>
         </div>
-    </footer>
+    </footer >
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <!-- Cargamos la librería oficial de EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/min.js"></script>
+
+    <script>
+        // Inicializa con tu llave pública real
+        emailjs.init("UDHsuooPGC3Jp2aIK");
+
+        // Escuchar el envío del formulario
+        document.getElementById('contactForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Evita recarga de página
+
+            const btn = document.querySelector('.btn-institucional');
+            btn.textContent = 'ENVIANDO...';
+            btn.disabled = true;
+
+            // Recolectar variables ordenadamente
+            const templateParams = {
+                alumno_nombre: event.target.alumno_nombre.value,
+                alumno_apellido_p: event.target.alumno_apellido_p.value,
+                alumno_apellido_m: event.target.alumno_apellido_m.value,
+                grado_aspira: event.target.grado_aspira.value,
+                ciclo_escolar: event.target.ciclo_escolar.value,
+                tutor_nombre: event.target.tutor_nombre.value,
+                tutor_email: event.target.tutor_email.value,
+                tutor_whatsapp: event.target.tutor_whatsapp.value
+            };
+
+            // Mandar los datos a EmailJS usando tu nuevo template_id
+            emailjs.send('service_3jecg3c', 'template_2l6natq', templateParams)
+                .then(function() {
+                    alert('¡Solicitud de informes enviada con éxito! Nos comunicaremos pronto.');
+                    event.target.reset();
+                    btn.textContent = 'Enviar Solicitud de Información';
+                    btn.disabled = false;
+                }, function(error) {
+                    alert('Error al enviar: ' + JSON.stringify(error));
+                    btn.textContent = 'Enviar Solicitud de Información';
+                    btn.disabled = false;
+                });
+        });
+    </script>
 </body>
 
 </html>
