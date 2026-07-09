@@ -7,6 +7,14 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    
+    <!-- PASO 1: Movimos la librería aquí arriba para garantizar que cargue antes que todo -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/min.js"></script>
+    <script>
+        // Inicializamos inmediatamente
+        emailjs.init("UDHsuooPGC3Jp2aIK");
+    </script>
+
     <style>
         /* --- ESTILO HERO CON DEGRADADO --- */
         .hero {
@@ -285,27 +293,26 @@
                 </div>
             </div>
         </div>
-    </footer >
+    </footer>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
-    <!-- Cargamos la librería oficial de EmailJS -->
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/min.js"></script>
-
     <script>
-        // Inicializa con tu llave pública real
-        emailjs.init("UDHsuooPGC3Jp2aIK");
-
-        // Escuchar el envío del formulario
+        // Escuchar el envío del formulario de manera segura
         document.getElementById('contactForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Evita recarga de página
+            event.preventDefault(); // Evitamos que refresque la pantalla
+
+            // Validar que EmailJS exista antes de ejecutarlo
+            if (typeof emailjs === 'undefined') {
+                alert('La librería de correos no cargó correctamente. Revisa tu conexión a internet e inténtalo de nuevo.');
+                return;
+            }
 
             const btn = document.querySelector('.btn-institucional');
             btn.textContent = 'ENVIANDO...';
             btn.disabled = true;
 
-            // Recolectar variables ordenadamente
             const templateParams = {
                 alumno_nombre: event.target.alumno_nombre.value,
                 alumno_apellido_p: event.target.alumno_apellido_p.value,
@@ -317,7 +324,7 @@
                 tutor_whatsapp: event.target.tutor_whatsapp.value
             };
 
-            // Mandar los datos a EmailJS usando tu nuevo template_id
+            // Mandar los datos a EmailJS usando tu template definitivo
             emailjs.send('service_3jecg3c', 'template_2l6natq', templateParams)
                 .then(function() {
                     alert('¡Solicitud de informes enviada con éxito! Nos comunicaremos pronto.');
