@@ -74,7 +74,7 @@
             flex: 0 0 auto;
         }
         .logo-colegio { 
-            height: 40px; /* Ajustado para emparejar con el resto de pestañas */
+            height: 40px; 
             width: auto;
             margin-right: 15px; 
         }
@@ -203,7 +203,8 @@
 
     <section class="container mt-4 mb-5">
         <div class="form-container card-moderna p-4 shadow-sm bg-white" style="border-radius: 15px;">
-            <form action="https://formspree.io/f/xgorodvk" method="POST" enctype="multipart/form-data">
+            <!-- SE CORRIGIÓ EL FORM DE ENTRADA AQUÍ -->
+            <form>
                 
                 <h4 style="color: #193E9A; margin-bottom: 20px; font-weight: 700;">Datos Personales</h4>
                 <div class="row">
@@ -259,8 +260,6 @@
                         <textarea name="experiencia" class="form-control" rows="3" placeholder="Cuéntanos brevemente sobre tu experiencia..."></textarea>
                     </div>
                 </div>
-
-                <input type="hidden" name="_subject" value="Nueva Vacante: Postulación de Bolsa de Trabajo">
                 
                 <button type="submit" class="btn-institucional mt-4">Enviar Postulación</button>
             </form>
@@ -287,11 +286,70 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
+    <!-- 1. Cargamos la librería oficial de EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/min.js"></script>
+
     <script>
-        document.getElementById('customFile').onchange = function () {
-            var fileName = this.value.split("\\").pop();
-            document.getElementById('fileLabel').innerHTML = fileName;
-        };
+        // 2. Inicializa con tu llave pública real
+        emailjs.init("UDHsuooPGC3Jp2aIK");
+
+        // Manejar el cambio de nombre del archivo en la interfaz de Bootstrap
+        document.getElementById('customFile').addEventListener('change', function(e) {
+            var fileName = e.target.files[0] ? e.target.files[0].name : "Seleccionar archivo...";
+            document.getElementById('fileLabel').textContent = fileName;
+        });
+
+        // 3. Procesar y enviar el formulario
+        document.querySelector('form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Evita que la página se recargue
+
+            const btn = document.querySelector('.btn-institucional');
+            btn.textContent = 'Enviando...';
+            btn.disabled = true;
+
+            const fileInput = document.getElementById('customFile');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Por favor, selecciona tu CV.');
+                btn.textContent = 'Enviar Postulación';
+                btn.disabled = false;
+                return;
+            }
+
+            // Leer el archivo adjunto y convertirlo a Base64
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function () {
+                const base64String = reader.result.split(',')[1]; // Extrae solo el contenido base64
+
+                // Recopilamos todos los datos del formulario ordenadamente
+                const templateParams = {
+                    nombre: event.target.nombre.value,
+                    apellidos: event.target.apellidos.value,
+                    email: event.target.email.value,
+                    whatsapp: event.target.whatsapp.value,
+                    area_interes: event.target.area_interes.value,
+                    estudios: event.target.estudios.value,
+                    experiencia: event.target.experiencia.value,
+                    curriculum: base64String // Envío del archivo por código
+                };
+
+                // Mandar los datos usando tus credenciales reales
+                emailjs.send('service_3jecg3c', 'template_9ji5y7s', templateParams)
+                    .then(function() {
+                        alert('¡Postulación enviada con éxito!');
+                        event.target.reset();
+                        document.getElementById('fileLabel').textContent = "Seleccionar archivo...";
+                        btn.textContent = 'Enviar Postulación';
+                        btn.disabled = false;
+                    }, function(error) {
+                        alert('Error al enviar: ' + JSON.stringify(error));
+                        btn.textContent = 'Enviar Postulación';
+                        btn.disabled = false;
+                    });
+            };
+        });
     </script>
 </body>
 </html>
