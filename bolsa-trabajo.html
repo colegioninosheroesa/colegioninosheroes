@@ -140,6 +140,7 @@
         .btn-institucional { 
             background-color: #193E9A; color: white; border: none; padding: 12px 30px; 
             border-radius: 25px; font-weight: bold; transition: 0.3s; width: 100%;
+            text-transform: uppercase;
         }
         .btn-institucional:hover { background-color: #0d2561; cursor: pointer; color: white; }
 
@@ -203,8 +204,7 @@
 
     <section class="container mt-4 mb-5">
         <div class="form-container card-moderna p-4 shadow-sm bg-white" style="border-radius: 15px;">
-            <!-- SE CORRIGIÓ EL FORM DE ENTRADA AQUÍ -->
-            <form>
+            <form id="employmentForm">
                 
                 <h4 style="color: #193E9A; margin-bottom: 20px; font-weight: 700;">Datos Personales</h4>
                 <div class="row">
@@ -286,25 +286,19 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
-    <!-- 1. Cargamos la librería oficial de EmailJS -->
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/min.js"></script>
-
     <script>
-        // 2. Inicializa con tu llave pública real
-        emailjs.init("UDHsuooPGC3Jp2aIK");
-
-        // Manejar el cambio de nombre del archivo en la interfaz de Bootstrap
+        // Manejar visualmente el cambio de nombre del archivo adjunto
         document.getElementById('customFile').addEventListener('change', function(e) {
             var fileName = e.target.files[0] ? e.target.files[0].name : "Seleccionar archivo...";
             document.getElementById('fileLabel').textContent = fileName;
         });
 
-        // 3. Procesar y enviar el formulario
-        document.querySelector('form').addEventListener('submit', function(event) {
-            event.preventDefault(); // Evita que la página se recargue
+        // Procesar y enviar el formulario de manera directa mediante Fetch Nativo
+        document.getElementById('employmentForm').addEventListener('submit', function(event) {
+            event.preventDefault();
 
             const btn = document.querySelector('.btn-institucional');
-            btn.textContent = 'Enviando...';
+            btn.textContent = 'ENVIANDO...';
             btn.disabled = true;
 
             const fileInput = document.getElementById('customFile');
@@ -317,37 +311,53 @@
                 return;
             }
 
-            // Leer el archivo adjunto y convertirlo a Base64
+            // Convertir el archivo a Base64 para el envío seguro por JSON
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = function () {
-                const base64String = reader.result.split(',')[1]; // Extrae solo el contenido base64
+                const base64String = reader.result.split(',')[1];
 
-                // Recopilamos todos los datos del formulario ordenadamente
-                const templateParams = {
-                    nombre: event.target.nombre.value,
-                    apellidos: event.target.apellidos.value,
-                    email: event.target.email.value,
-                    whatsapp: event.target.whatsapp.value,
-                    area_interes: event.target.area_interes.value,
-                    estudios: event.target.estudios.value,
-                    experiencia: event.target.experiencia.value,
-                    curriculum: base64String // Envío del archivo por código
+                // Estructura de envío limpia para la API pública de EmailJS
+                const datosEnvio = {
+                    service_id: 'service_3jecg3c',
+                    template_id: 'template_9ji5y7s',
+                    user_id: 'UDHsuooPGC3Jp2aIK',
+                    template_params: {
+                        nombre: event.target.nombre.value,
+                        apellidos: event.target.apellidos.value,
+                        email: event.target.email.value,
+                        whatsapp: event.target.whatsapp.value,
+                        area_interes: event.target.area_interes.value,
+                        estudios: event.target.estudios.value,
+                        experiencia: event.target.experiencia.value,
+                        curriculum: base64String
+                    }
                 };
 
-                // Mandar los datos usando tus credenciales reales
-                emailjs.send('service_3jecg3c', 'template_9ji5y7s', templateParams)
-                    .then(function() {
+                // Petición POST nativa
+                fetch('https://api.emailjs.com/api/v1.0/email/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(datosEnvio)
+                })
+                .then(function(respuesta) {
+                    if (respuesta.ok) {
                         alert('¡Postulación enviada con éxito!');
-                        event.target.reset();
+                        document.getElementById('employmentForm').reset();
                         document.getElementById('fileLabel').textContent = "Seleccionar archivo...";
-                        btn.textContent = 'Enviar Postulación';
-                        btn.disabled = false;
-                    }, function(error) {
-                        alert('Error al enviar: ' + JSON.stringify(error));
-                        btn.textContent = 'Enviar Postulación';
-                        btn.disabled = false;
-                    });
+                    } else {
+                        alert('Hubo un inconveniente en el servidor al enviar la postulación.');
+                    }
+                    btn.textContent = 'Enviar Postulación';
+                    btn.disabled = false;
+                })
+                .catch(function(error) {
+                    alert('No se pudo establecer conexión con el sistema de vacantes.');
+                    btn.textContent = 'Enviar Postulación';
+                    btn.disabled = false;
+                });
             };
         });
     </script>
