@@ -94,6 +94,13 @@
             font-weight: 600;
             letter-spacing: 0.5px;
         }
+        
+        .footer-colegio {
+            background-color: #193E9A;
+            padding: 30px 0;
+            margin-top: 50px;
+            color: white;
+        }
 
         /* DISEÑO DE LA BOLETA MODERNA */
         .report-card-container {
@@ -262,27 +269,31 @@
         .pastel-lila tbody tr td { background-color: #F3E5F5 !important; color: #4a148c !important; }
         .pastel-lila tbody tr td.promedio-col { background-color: #BA68C8 !important; font-weight: 900 !important; }
 
-        /* RESPONSIVO CORREGIDO PARA ALINEACIÓN IDÉNTICA */
+        /* RESPONSIVO CORREGIDO: TAMAÑOS IDÉNTICOS A LA REFERENCIA */
         @media (max-width: 768px) {
             .navbar .container {
                 flex-direction: column !important;
-                align-items: flex-start !important; /* Alínea todo a la izquierda como en la referencia */
-                gap: 10px;
+                align-items: flex-start !important;
+                gap: 12px;
+                padding-left: 20px; /* Margen idéntico al borde izquierdo */
             }
             .navbar-brand {
-                font-size: 1.4rem;
+                font-size: 1.65rem !important; /* Mismo tamaño destacado del texto */
+                font-weight: 800;
                 justify-content: flex-start !important;
                 margin-right: 0;
                 width: 100%;
+                padding: 5px 0;
             }
             .navbar-brand img {
-                height: 45px !important;
-                margin-right: 8px;
+                height: 55px !important; /* Mismo tamaño grande para el logotipo */
+                margin-right: 12px;
             }
             .btn-volver {
-                align-self: flex-start !important; /* Evita que se estire o se centre */
-                padding: 4px 20px;
-                font-size: 0.95rem;
+                align-self: flex-start !important;
+                padding: 6px 24px;
+                font-size: 1rem;
+                margin-bottom: 5px;
             }
             .hero h1 {
                 font-size: 2rem !important;
@@ -344,6 +355,19 @@
 <!-- CONTENEDORES DE LAS BOLETAS -->
 <div id="reportCardExtra" class="report-card-container"></div>
 <div id="reportCardIngles" class="report-card-container page-break"></div>
+
+<footer class="footer-colegio">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8 text-center text-md-left mb-3 mb-md-0">
+                    <p class="mb-0 text-white">© 2026 <strong>Colegio Niños Héroes Atizapán</strong>. Todos los derechos reservados.</p>
+                </div>
+                <div class="col-md-4 text-center text-md-right">
+                    <a href="bolsa-trabajo.html" class="link-unete"><i class="fas fa-briefcase mr-2"></i>Únete a nuestro equipo</a>
+                </div>
+            </div>
+        </div>
+    </footer>
 
 <script>
         const RUTA_EXCEL_EXTRA = "Datos/BoletaExtracurriculares.xlsx";
