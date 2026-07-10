@@ -262,25 +262,27 @@
         .pastel-lila tbody tr td { background-color: #F3E5F5 !important; color: #4a148c !important; }
         .pastel-lila tbody tr td.promedio-col { background-color: #BA68C8 !important; font-weight: 900 !important; }
 
-        /* RESPONSIVO */
+        /* RESPONSIVO CORREGIDO PARA ALINEACIÓN IDÉNTICA */
         @media (max-width: 768px) {
             .navbar .container {
                 flex-direction: column !important;
-                gap: 12px;
-                text-align: center;
+                align-items: flex-start !important; /* Alínea todo a la izquierda como en la referencia */
+                gap: 10px;
             }
             .navbar-brand {
-                font-size: 1.3rem;
-                justify-content: center;
+                font-size: 1.4rem;
+                justify-content: flex-start !important;
                 margin-right: 0;
+                width: 100%;
             }
             .navbar-brand img {
-                height: 50px !important;
+                height: 45px !important;
+                margin-right: 8px;
             }
             .btn-volver {
-                width: 100%;
-                max-width: 200px;
-                text-align: center;
+                align-self: flex-start !important; /* Evita que se estire o se centre */
+                padding: 4px 20px;
+                font-size: 0.95rem;
             }
             .hero h1 {
                 font-size: 2rem !important;
