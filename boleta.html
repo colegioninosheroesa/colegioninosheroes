@@ -27,6 +27,9 @@
             padding: 15px 40px; 
             background: var(--blanco); 
             border-bottom: 1px solid #eee; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         .navbar-brand { 
             display: flex; 
@@ -53,14 +56,38 @@
             color: white !important; 
         }
 
-      .hero {
+        /* RESPONSIVO PARA EL NAVBAR (CELULARES) */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+                flex-direction: column; /* Coloca el logo arriba y el botón abajo */
+                gap: 12px;             /* Añade separación elegante entre ellos */
+                text-align: center;
+            }
+            .navbar-brand {
+                font-size: 1.3rem;     /* Reduce un pelín el texto para que no se rompa en pantallas chicas */
+                justify-content: center;
+                margin-right: 0;
+            }
+            .logo-nav {
+                height: 35px;          /* Ajusta ligeramente el logo en móvil */
+                margin-right: 10px;
+            }
+            .btn-volver {
+                width: 100%;           /* Hace que el botón abarque el ancho disponible, siendo más fácil de presionar */
+                max-width: 200px;      /* Evita que se vuelva gigante a lo ancho */
+                padding: 8px 20px;
+            }
+        }
+
+        /* El resto de tus estilos se quedan exactamente igual... */
+        .hero {
             background: linear-gradient(135deg, #317F77 0%, #317F77 100%);
             padding: 80px 0;
             text-align: center;
             color: white;
             margin-bottom: 20px;
         }
-
         .hero h1 {
             font-weight: 800;
             font-size: 3rem;
