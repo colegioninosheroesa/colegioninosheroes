@@ -6,8 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link class="icon" href="data:,">
     <title>Consulta de Calificaciones - Colegio Niños Héroes</title>
+    <!-- Pon esto en el <head> de tu archivo de Boletas -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="style.css"> <!-- <-- ESTA LÍNEA ES CLAVE -->>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
    <style>
     :root {
@@ -17,7 +19,6 @@
         --blanco: #FFFFFF;
     }
 
-    /* Forzamos la tipografía nativa de Bootstrap */
     body {
         background-color: var(--gris-fondo);
     }
@@ -42,21 +43,21 @@
     }
     .btn-volver:hover { background: var(--azul-id); color: white !important; }
 
-    /* EL HERO UNIFICADO CON EL DE CALENDARIOS (Optimizados los tamaños) */
+    /* EL HERO UNIFICADO CON EL DE CALENDARIOS (Ajustado a 3rem e idéntico) */
     .hero {
         background: linear-gradient(135deg, #317F77 0%, #317F77 100%);
-        padding: 60px 0; 
+        padding: 80px 0; /* Igual a Calendarios */
         text-align: center;
         color: white;
         margin-bottom: 20px;
     }
     .hero h1 {
         font-weight: 800;
-        font-size: 2.2rem; 
+        font-size: 3rem; /* Cambiado a 3rem para igualar a Calendarios */
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
     }
 
-    /* BUSCADOR */
+    /* BUSCADOR (Actualizado con bordes redondeados de 20px como las tarjetas de recursos) */
     .search-container { 
         max-width: 600px; 
         margin: 0 auto 40px; 
@@ -64,27 +65,26 @@
     .search-box-wrapper {
         display: flex;
         gap: 10px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08); /* Sombra suave idéntica */
         background: white;
         padding: 10px;
-        border-radius: 15px;
-        border: 1px solid #ddd;
+        border-radius: 20px; /* Bordes de 20px como las tarjetas de recursos */
     }
     #matriculaInput { 
         border: 1px solid #ced4da; 
-        border-radius: 10px;
+        border-radius: 12px; /* Redondeado sutil para inputs */
         padding-left: 15px; 
         height: 50px; 
-        font-size: 1.1rem; 
+        font-size: 1rem; 
         font-weight: 600;
     }
     .btn-buscar { 
         background: var(--verde-id) !important; 
         color: white !important; 
         border: none !important; 
-        border-radius: 10px !important;
-        padding: 0 35px; 
-        font-weight: 800; 
+        border-radius: 12px !important;
+        padding: 0 30px; 
+        font-weight: 700; 
         height: 50px;
     }
 
@@ -263,10 +263,10 @@
     .pastel-lila tbody tr td { background-color: #F3E5F5 !important; color: #4a148c !important; }
     .pastel-lila tbody tr td.promedio-col { background-color: #BA68C8 !important; font-weight: 900 !important; }
 
-    /* RESPONSIVO PARA EL NAVBAR (CELULARES) */
+    /* RESPONSIVO AJUSTADO PARA EVITAR DESFASES */
     @media (max-width: 768px) {
         .navbar .container {
-            flex-direction: column !important; /* Coloca el logo arriba y el botón abajo */
+            flex-direction: column !important;
             gap: 12px;
             text-align: center;
         }
@@ -276,12 +276,16 @@
             margin-right: 0;
         }
         .navbar-brand img {
-            height: 40px !important;
+            height: 50px !important; /* Mantenemos consistencia con Calendarios */
         }
         .btn-volver {
             width: 100%;
             max-width: 200px;
             text-align: center;
+        }
+        /* Forzar que el título se autoajuste bien en móviles */
+        .hero h1 {
+            font-size: 2rem !important;
         }
     }
 
@@ -300,32 +304,36 @@
 
 <body>
 
-    <!-- REEMPLAZA TU <nav> ACTUAL EN BOLETAS POR ESTE EXACTAMENTE -->
+    <!-- NAVBAR IDENTICO AL DE RECURSOS -->
 <nav class="navbar navbar-expand-lg sticky-top navbar-light bg-white shadow-sm">
     <div class="container d-flex justify-content-between align-items-center">
-        <a class="navbar-brand" href="index.html" style="font-weight: 800; color: #193E9A !important; display: flex; align-items: center;">
-            <img src="Iconos/logo.png" style="height: 50px;" class="mr-2"> Colegio Niños Héroes
+        <a class="navbar-brand" href="index.html" style="font-weight: 800; color: #193E9A !important;">
+            <img src="Iconos/logo.png" style="height: 50px;"> Colegio Niños Héroes
         </a>
         <a href="comunidad.html" class="btn-volver">← Volver</a>
     </div>
 </nav>
 
-    <header class="hero">
-        <div class="container">
-            <h1>Portal de Boletas Oficiales</h1>
-            <p class="lead">Introduce la matrícula para generar las boletas a partir de los registros del repositorio.</p>
-        </div>
-    </header>
+<!-- HERO IDENTICO -->
+<header class="hero">
+    <div class="container">
+        <h1>Portal de Boletas Oficiales</h1>
+        <p class="lead">Introduce la matrícula para generar las boletas a partir de los registros del repositorio.</p>
+    </div>
+</header>
 
-    <div class="container search-container no-print" id="searchSection" style="opacity: 0.5; pointer-events: none;">
+<!-- BUSCADOR CON DISEÑO DE BORDES REDONDEADOS IGUAL A LAS TARJETAS -->
+<div class="container mt-5">
+    <div class="search-container">
         <div class="search-box-wrapper">
-            <input type="text" id="matriculaInput" class="form-control" placeholder="Cargando base de datos, espere...">
-            <button class="btn btn-buscar" onclick="buscarBoletasExcel()">BUSCAR</button>
+            <input type="text" id="matriculaInput" class="form-control" placeholder="Ingrese la matrícula">
+            <button class="btn btn-buscar" onclick="buscarBoleta()">BUSCAR</button>
         </div>
-        
-        <div class="text-center version-tag" id="loadStatus">
-            <i class="fas fa-spinner fa-spin mr-1"></i> Sincronizando archivos. 419
+        <div class="text-center version-tag text-success mt-3">
+            <i class="fas fa-check-circle"></i> Repositorio sincronizado correctamente.
         </div>
+    </div>
+</div>
         
         <div id="statusMsg" class="text-center mt-3 font-weight-bold"></div>
         <div class="text-center mt-3" id="printBtnContainer" style="display:none;">
