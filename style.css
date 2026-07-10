@@ -117,54 +117,38 @@ h1, h2, h3, h4, h5, .navbar-brand, .nav-link {
    MÓVILES (Celulares y Tablets)
    ========================================= */
 @media (max-width: 991px) {
-    /* Mantiene tamaño grande original en el cel como te gusta */
-    .logo-colegio { 
-        height: 90px; 
-    }
-
-    /* Permite que los elementos se acomoden sin achicarse */
-    .navbar > .container {
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: wrap !important; 
-        justify-content: space-between !important;
-        align-items: center !important;
-    }
-
-    /* El nombre usa el espacio izquierdo libre */
-    .navbar-brand {
-        display: flex !important;
-        align-items: center !important;
-        flex: 1 !important; 
-        margin-right: 10px !important;
-    }
-
-    /* Manda la hamburguesa arriba a la derecha de forma fija */
-    .navbar-toggler {
-        order: 2 !important; 
-        margin-left: auto !important;
-    }
+    /* ... (deja el código anterior de .navbar, .navbar-brand y .navbar-toggler igual) ... */
 
     /* Estilos del menú desplegable vertical en móviles */
     .navbar-collapse {
         text-align: center;
         padding: 20px 0;
         width: 100%;
-        order: 3; /* Se despliega abajo del encabezado */
+        order: 3; 
     }
 
     .navbar-nav {
         display: flex;
         flex-direction: column; 
-        gap: 15px;
+        gap: 20px; /* Aumentamos la separación para que no se amontonen los textos grandes */
         width: 100%; 
         align-items: center;
         margin: 15px 0;
     }
 
+    /* ¡AQUÍ ESTÁ EL CAMBIO! Texto del menú más grande en celular */
+    .nav-link { 
+        font-size: 1.4rem !important;  /* Letra más grande y legible en móvil */
+        font-weight: 700 !important;   /* Letra más imponente */
+        padding: 10px 0 !important;
+    }
+
+    /* Botón de WhatsApp más llamativo en celular */
     .btn-whatsapp-nav { 
         width: 100%; 
-        max-width: 250px;
+        max-width: 280px;             /* Un poquito más ancho */
+        font-size: 1.2rem !important;  /* Letra más grande dentro del botón */
+        padding: 14px 25px !important; /* Más cuerpo para presionar fácil */
     }
 }
 
