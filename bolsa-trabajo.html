@@ -45,6 +45,7 @@
             transform: scale(1.1);
         }
 
+        /* NAVBAR UNIFICADO */
         .navbar { 
             background: var(--blanco) !important;
             box-shadow: 0 10px 30px rgba(0,0,0,0.05);
@@ -60,14 +61,17 @@
             padding-right: 40px;
         }
         .navbar-brand {
+            font-family: inherit !important;
             color: var(--azul-id) !important;
             font-size: 1.8rem; 
-            font-weight: 900;
+            font-weight: 900 !important; /* Fuerza idéntica a Recursos */
             display: flex;
             align-items: center;
             flex: 0 0 auto;
+            letter-spacing: -0.5px;
         }
-        .logo-colegio { height: 40px; margin-right: 15px; }
+        .logo-colegio { height: 50px; margin-right: 15px; }
+        
         .navbar-collapse {
             flex-grow: 1; 
             display: flex !important;
@@ -99,6 +103,7 @@
             font-size: 0.9rem;
         }
 
+        /* HERO CON RESGUARDO PARA MÓVIL */
         .hero {
             background: linear-gradient(135deg, #317F77 0%, #317F77 100%);
             padding: 60px 0;
@@ -106,9 +111,8 @@
             color: white;
             margin-bottom: 20px;
         }
-        .hero h1 { font-weight: 800; font-size: 2.8rem; }
+        .hero h1 { font-weight: 800; font-size: 2.8rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
 
-        /* Corrección total para que el select sea perfectamente interactivo */
         select.form-control-select {
             display: block !important;
             width: 100% !important;
@@ -123,7 +127,6 @@
         }
         .form-control { margin-bottom: 15px; border-radius: 8px; }
         
-        /* Botón de adjuntar nativo y limpio */
         .input-archivo-real {
             display: block;
             width: 100%;
@@ -144,6 +147,47 @@
 
         .footer-colegio { background-color: #193E9A; padding: 30px 0; margin-top: 50px; color: white; }
         .texto-nowrap { white-space: nowrap; font-size: 0.95rem; }
+
+        /* ADAPTACIÓN RESPONSIVA SECCIÓN CRÍTICA */
+        @media (max-width: 768px) {
+            .navbar .container {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 12px;
+                padding-left: 15px;
+            }
+            .navbar-brand {
+                font-family: inherit !important;
+                font-size: 1.55rem !important; 
+                font-weight: 900 !important;
+                justify-content: flex-start !important;
+                margin-right: 0;
+                width: 100%;
+                padding: 5px 0;
+            }
+            .logo-colegio {
+                height: 50px !important;
+                margin-right: 10px;
+            }
+            .navbar-collapse {
+                width: 100%;
+            }
+            .navbar-nav {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                width: 100% !important;
+                gap: 10px;
+            }
+            /* SOLUCIÓN LETRAS CORTADAS */
+            .hero {
+                padding: 45px 0 35px 0 !important;
+            }
+            .hero h1 {
+                font-size: 1.85rem !important;
+                line-height: 1.2 !important;
+                margin-top: 10px !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -232,7 +276,6 @@
                 <div class="row">
                     <div class="col-12 mb-3">
                         <label class="small font-weight-bold">Adjuntar CV (PDF o Word) *</label>
-                        <!-- Reemplazado por un input tradicional que responde al 100% de los clics -->
                         <input type="file" name="curriculum" class="input-archivo-real" id="customFile" accept=".pdf,.doc,.docx" required>
                     </div>
                 </div>
@@ -256,70 +299,65 @@
         </div>
     </footer>
 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-
-    <!-- PROCESADOR EXCLUSIVO PARA EMAILJS SIN LÍMITES DE TAMAÑO -->
- <script>
-    document.getElementById('bolsaTrabajoForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-
-        const btn = document.querySelector('.btn-institucional');
-        btn.textContent = 'PROCESANDO Y ENVIANDO...';
-        btn.disabled = true;
-
-        const fileInput = document.getElementById('customFile');
-        const file = fileInput.files[0];
-
-        if (!file) {
-            alert('Por favor, selecciona tu archivo CV.');
-            btn.textContent = 'Enviar Postulación';
-            btn.disabled = false;
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = function () {
-            
-            const datosEnvio = {
-                nombre: event.target.nombre.value,
-                apellidos: event.target.apellidos.value,
-                email: event.target.email.value,
-                whatsapp: event.target.whatsapp.value,
-                area_interes: event.target.area_interes.value,
-                estudios: event.target.estudios.value,
-                experiencia: event.target.experiencia.value,
-                curriculum: reader.result
-            };
-
-            // REEMPLAZA ESTA URL POR LA URL LARGA QUE TE DIO GOOGLE SCRIPT
-            const urlGoogleScript = 'https://script.google.com/macros/s/AKfycbwmp3y19vJdlFpSyjmPnVFbsxB_kx0BSSRSFI_oievgyt4PkyOvyk9R-yufaeWRxnxqOA/exec';
-
-            fetch(urlGoogleScript, {
-                method: 'POST',
-                mode: 'no-cors', // Permite comunicación segura e invisible entre GitHub y Google
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(datosEnvio)
-            })
-            .then(function() {
-                // Al usar no-cors, asumimos éxito inmediato al procesar la petición
-                alert('¡Postulación enviada con éxito! El departamento de administración revisará tu perfil.');
-                document.getElementById('bolsaTrabajoForm').reset();
-                btn.textContent = 'Enviar Postulación';
-                btn.disabled = false;
-            })
-            .catch(function(error) {
-                alert('Hubo un problema al conectar con el servidor de envíos.');
-                btn.textContent = 'Enviar Postulación';
-                btn.disabled = false;
-            });
-        };
-    });
-</script>
-<!-- Scripts obligatorios para Bootstrap 4 (Van antes de cerrar el body) -->
+    <!-- Scripts unificados y ordenados para Bootstrap 4 -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script>
+        document.getElementById('bolsaTrabajoForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const btn = document.querySelector('.btn-institucional');
+            btn.textContent = 'PROCESANDO Y ENVIANDO...';
+            btn.disabled = true;
+
+            const fileInput = document.getElementById('customFile');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Por favor, selecciona tu archivo CV.');
+                btn.textContent = 'Enviar Postulación';
+                btn.disabled = false;
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function () {
+                
+                const datosEnvio = {
+                    nombre: event.target.nombre.value,
+                    apellidos: event.target.apellidos.value,
+                    email: event.target.email.value,
+                    whatsapp: event.target.whatsapp.value,
+                    area_interes: event.target.area_interes.value,
+                    estudios: event.target.estudios.value,
+                    experiencia: event.target.experiencia.value,
+                    curriculum: reader.result
+                };
+
+                const urlGoogleScript = 'https://script.google.com/macros/s/AKfycbwmp3y19vJdlFpSyjmPnVFbsxB_kx0BSSRSFI_oievgyt4PkyOvyk9R-yufaeWRxnxqOA/exec';
+
+                fetch(urlGoogleScript, {
+                    method: 'POST',
+                    mode: 'no-cors', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datosEnvio)
+                })
+                .then(function() {
+                    alert('¡Postulación enviada con éxito! El departamento de administración revisará tu perfil.');
+                    document.getElementById('bolsaTrabajoForm').reset();
+                    btn.textContent = 'Enviar Postulación';
+                    btn.disabled = false;
+                })
+                .catch(function(error) {
+                    alert('Hubo un problemilla al conectar con el servidor de envíos.');
+                    btn.textContent = 'Enviar Postulación';
+                    btn.disabled = false;
+                });
+            };
+        });
+    </script>
 </body>
 </html>
