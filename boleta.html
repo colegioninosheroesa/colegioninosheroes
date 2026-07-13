@@ -8,7 +8,6 @@
     <title>Consulta de Calificaciones - Colegio Niños Héroes</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -460,19 +459,17 @@
             font-weight: 900 !important;
         }
 
-        /* RESPONSIVO CORREGIDO: TAMAÑOS, ALINEACIÓN Y TIPOGRAFÍA IDÉNTICOS */
+        /* RESPONSIVO CORREGIDO */
         @media (max-width: 768px) {
             .navbar .container {
                 flex-direction: column !important;
                 align-items: flex-start !important;
                 gap: 12px;
                 padding-left: 15px;
-                /* Alineación de contenedor nativa */
             }
 
             .navbar-brand img {
                 height: 50px !important;
-                /* Mismo tamaño físico que el archivo de recursos */
                 margin-right: 10px;
             }
 
@@ -483,20 +480,14 @@
                 margin-bottom: 5px;
             }
 
-            /* 1. LE DA MÁS ESPACIO AL CONTENEDOR VERDE ARRIBA PARA QUE NO COMAN LAS LETRAS */
             .hero {
                 padding: 45px 0 35px 0 !important;
-                /* Aumenta el espacio superior en móvil */
             }
 
-            /* 2. AJUSTA EL TAMAÑO DE LA LETRA PARA QUE JÁMAS CHOQUE CON EL NAV */
             .hero h1 {
                 font-size: 1.85rem !important;
-                /* Un pelín más pequeño en móvil para que quepa perfecto */
                 line-height: 1.2 !important;
-                /* Controla la altura de la línea */
                 margin-top: 10px !important;
-                /* Separa el título del borde superior */
             }
         }
 
@@ -617,24 +608,6 @@
 
         let BASE_EXTRA_MEMORIA = {};
         let BASE_INGLES_MEMORIA = {};
-
-        const MATERIAS_MAP = {
-            ingles: (nivelTexto) => {
-                const nl = (nivelTexto || "").toUpperCase();
-                if (nl.includes('MATERNAL') || nl.includes('KINDER') || nl.includes('PREESCOLAR')) return ['LISTENING', 'READING'];
-                return ['LISTENING', 'READING', 'WRITING', 'SPEAKING', 'COMPOSITION'];
-            },
-            extra: (nivelTexto) => {
-                const nl = (nivelTexto || "").toUpperCase();
-                if (nl.includes('MATERNAL') || nl.includes('KINDER') || nl.includes('PREESCOLAR')) return ['EDUCACIÓN FÍSICA', 'DANZA', 'MÚSICA', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMÁTICA', 'EMOCIONES'];
-                if (nl.includes('PRIMARIA 1') || nl.includes('PRIMARIA 2')) return ['EDUCACIÓN FÍSICA', 'DANZA', 'MÚSICA', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMÁTICA', 'JUEGOS Y DESTREZAS', 'ROBÓTICA', 'EDUCACIÓN FINANCIERA', 'SISTÉMICA', 'LECTURA', 'SPELLING BEE'];
-                if (nl.includes('PRIMARIA')) return ['EDUCACIÓN FÍSICA', 'DANZA', 'MÚSICA', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMÁTICA', 'JUEGOS Y DESTREZAS', 'ROBÓTICA', 'EDUCACIÓN FINANCIERA', 'SISTÉMICA'];
-                if (nl.includes('SECUNDARIA 2')) return ['EDUCACIÓN FÍSICA', 'DANZA', 'ARTES', 'MÚSICA', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMÁTICA', 'HERRAMIENTAS DIGITALES', 'AJEDREZ', 'ROBÓTICA', 'ORTOGRAFÍA', 'SISTÉMICA'];
-                if (nl.includes('SECUNDARIA')) return ['EDUCACIÓN FÍSICA', 'DANZA', 'ARTES', 'MÚSICA', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMÁTICA', 'HERRAMIENTAS DIGITALES', 'AJEDREZ', 'ROBÓTICA', 'SISTÉMICA'];
-                if (nl.includes('PREPARATORIA')) return ['EDUCACIÓN FÍSICA', 'DANZA', 'ARTES', 'TOCHO BANDERA', 'TAEKWONDO', 'INFORMÁTICA', 'HERRAMIENTAS DIGITALES', 'AJEDREZ', 'ROBÓTICA'];
-                return [];
-            }
-        };
 
         window.addEventListener('DOMContentLoaded', () => {
             cargarBasesDeGitHub();
@@ -782,26 +755,25 @@
             let listaMaterias = [];
             const limiteColumnas = Math.max(studentRow.length, materiasRow.length);
 
-            // Empezamos en la columna 5 (donde empieza la primera materia)
+            // Iniciamos en la columna 5 (F) tal como verificamos en los índices de JavaScript
             for (let i = 5; i < limiteColumnas;) {
                 if (!materiasRow[i] || materiasRow[i].toString().trim() === "") {
-                    i++; // Si la celda está vacía, avanzamos de 1 en 1 buscando una materia
+                    i++;
                     continue;
                 }
 
                 let nombreMateriaCelda = materiasRow[i].toString().trim();
                 let nombreMateriaNorm = normalizarTexto(nombreMateriaCelda);
 
-                // Si topamos con el promedio final general de la boleta, detenemos el ciclo
                 if (nombreMateriaNorm.includes("CICLO") || nombreMateriaNorm === "PROMEDIO" || nombreMateriaNorm === "PROMEDIO FINAL") {
                     break;
                 }
 
-                // Extraemos las calificaciones según el nivel educativo
+                // Extraemos las calificaciones basadas en la estructura real
                 let v1 = fmt(studentRow[i]);     // T1 o S1
                 let v2 = fmt(studentRow[i + 1]);   // T2 o S2
-                let v3 = alumno.esPrepa ? null : fmt(studentRow[i + 2]); // T3 (Solo si no es prepa)
-                let vf = alumno.esPrepa ? fmt(studentRow[i + 2]) : fmt(studentRow[i + 3]); // PF de la materia
+                let v3 = alumno.esPrepa ? null : fmt(studentRow[i + 2]); // T3 (Solo básica)
+                let vf = alumno.esPrepa ? fmt(studentRow[i + 2]) : fmt(studentRow[i + 3]); // Promedio Final de la materia
 
                 listaMaterias.push({
                     n: nombreMateriaCelda.toUpperCase(),
@@ -811,8 +783,7 @@
                     vf: vf
                 });
 
-                // ¡AQUÍ ESTÁ EL CAMBIO IMPORTANTE!
-                // Si es Prepa avanza 3 columnas (S1, S2, PF). Si es Básica avanza 4 (T1, T2, T3, PF).
+                // Salto dinámico exacto de columnas para pasar al nombre de la siguiente materia
                 i += (alumno.esPrepa ? 3 : 4);
             }
 
@@ -847,86 +818,87 @@
             const nivelLimpio = obtenerNivelEducativoFormateado(alumno.nivel);
 
             div.innerHTML = `
-        <img src="Iconos/logo.png" class="sello-agua-fondo">
-        <div class="boleta-content-wrapper">
-            <div class="header-boleta">
-                <img src="Iconos/logo.png" class="logo-boleta">
-                <div class="school-info">
-                    <h1 class="school-name">COLEGIO NIÑOS HÉROES</h1>
-                    <h2 class="school-subtitle">Sección Académica</h2>
-                    <p class="school-address">DURANGO S/N AMP. ADOLFO LÓPEZ MATEOS, ATIZAPÁN DE ZARAGOZA.<br>TELS: 58204881 Y 5590557078</p>
+            <img src="Iconos/logo.png" class="sello-agua-fondo">
+            <div class="boleta-content-wrapper">
+                <div class="header-boleta">
+                    <img src="Iconos/logo.png" class="logo-boleta">
+                    <div class="school-info">
+                        <h1 class="school-name">COLEGIO NIÑOS HÉROES</h1>
+                        <h2 class="school-subtitle">Sección Académica</h2>
+                        <p class="school-address">DURANGO S/N AMP. ADOLFO LÓPEZ MATEOS, ATIZAPÁN DE ZARAGOZA.<br>TELS: 58204881 Y 5590557078</p>
+                    </div>
                 </div>
-            </div>
 
-            <div class="boleta-title-box">
-                <div class="boleta-title-text ${claseTituloColor}">${tituloFormateado}</div>
-            </div>
-
-            <div class="student-info-grid">
-                <div class="info-item"><span class="info-label">Ciclo Escolar:</span> <span class="info-value">${alumno.ciclo || '-'}</span></div>
-                <div class="info-item"><span class="info-label">Nivel Educativo:</span> <span class="info-value" style="text-transform: uppercase;">${nivelLimpio}</span></div>
-                <div class="info-item"><span class="info-label">Alumno:</span> <span class="info-value">${alumno.nombre || '-'}</span></div>
-                <div class="info-item"><span class="info-label">Grado y Grupo:</span> <span class="info-value">${alumno.grado || '-'} "${alumno.grupo || '-'}"</span></div>
-                
-                <div class="final-grade-box">
-                    <span class="final-grade-label">Calificación Final General:</span>
-                    <span class="final-grade-value">${pf}</span>
+                <div class="boleta-title-box">
+                    <div class="boleta-title-text ${claseTituloColor}">${tituloFormateado}</div>
                 </div>
-            </div>
 
-            <p style="font-style: italic; font-size: 0.82rem; text-align: center; margin: 20px 0; color: #718096; padding: 0 30px; line-height: 1.4;">
-                "La educación no solo forma estudiantes, forma seres humanos capaces de soñar en grande, de levantarse ante las dificultades y de construir con esfuerzo y valores el futuro que deseas alcanzar."
-            </p>
+                <div class="student-info-grid">
+                    <div class="info-item"><span class="info-label">Ciclo Escolar:</span> <span class="info-value">${alumno.ciclo || '-'}</span></div>
+                    <div class="info-item"><span class="info-label">Nivel Educativo:</span> <span class="info-value" style="text-transform: uppercase;">${nivelLimpio}</span></div>
+                    <div class="info-item"><span class="info-label">Alumno:</span> <span class="info-value">${alumno.nombre || '-'}</span></div>
+                    <div class="info-item"><span class="info-label">Grado y Grupo:</span> <span class="info-value">${alumno.grado || '-'} "${alumno.grupo || '-'}"</span></div>
+                    
+                    <div class="final-grade-box">
+                        <span class="final-grade-label">Calificación Final General:</span>
+                        <span class="final-grade-value">${pf}</span>
+                    </div>
+                </div>
 
-            <div class="grade-table-container">
-                <table class="grade-table ${clasePastel}">
-                    <thead>
-                        <tr>
-                            <th class="subject-col">Materias</th>
-                            ${alumno.esPrepa ? '<th>1er Sem</th><th>2do Sem</th>' : '<th>1er Trim</th><th>2do Trim</th><th>3er Trim</th>'}
-                            <th>Promedio Final</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${listaMaterias.length === 0 ? `
+                <p style="font-style: italic; font-size: 0.82rem; text-align: center; margin: 20px 0; color: #718096; padding: 0 30px; line-height: 1.4;">
+                    "La educación no solo forma estudiantes, forma seres humanos capaces de soñar en grande, de levantarse ante las dificultades y de construir con esfuerzo y valores el futuro que deseas alcanzar."
+                </p>
+
+                <div class="grade-table-container">
+                    <table class="grade-table ${clasePastel}">
+                        <thead>
                             <tr>
-                                <td colspan="${alumno.esPrepa ? 4 : 5}" class="text-center text-muted" style="padding: 20px; background: #fff;">
-                                    No se encontraron materias en el archivo Excel.
-                                </td>
+                                <th class="subject-col">Materias</th>
+                                ${alumno.esPrepa ? '<th>1er Sem</th><th>2do Sem</th>' : '<th>1er Trim</th><th>2do Trim</th><th>3er Trim</th>'}
+                                <th>Promedio Final</th>
                             </tr>
-                        ` : listaMaterias.map(m => `
-                            <tr>
-                                <td class="subject-col">${m.n}</td>
-                                <td>${m.v1}</td>
-                                <td>${m.v2}</td>
-                                ${!alumno.esPrepa ? `<td>${m.v3}</td>` : ''}
-                                <td class="promedio-col">${m.vf}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="contenedor-sello-dorado">
-                <img src="Iconos/sello.png" class="sello-dorado">
-            </div>
-
-            <div class="contenedor-firmas">
-                <div class="col-firma">
-                    <div class="linea-firma"></div>
-                    <p class="nombre-firma">${firmas.director}</p>
-                    <p class="puesto-firma">Director General</p>
+                        </thead>
+                        <tbody>
+                            ${listaMaterias.length === 0 ? `
+                                <tr>
+                                    <td colspan="${alumno.esPrepa ? 4 : 5}" class="text-center text-muted" style="padding: 20px; background: #fff;">
+                                        No se encontraron materias en el archivo Excel.
+                                    </td>
+                                </tr>
+                            ` : listaMaterias.map(m => `
+                                <tr>
+                                    <td class="subject-col">${m.n}</td>
+                                    <td>${m.v1}</td>
+                                    <td>${m.v2}</td>
+                                    ${!alumno.esPrepa ? `<td>${m.v3}</td>` : ''}
+                                    <td class="promedio-col">${m.vf}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
                 </div>
-                <div class="col-firma">
-                    <div class="linea-firma"></div>
-                    <p class="nombre-firma">${firmas.controlEscolar}</p>
-                    <p class="puesto-firma">Control Escolar</p>
+
+                <div class="contenedor-sello-dorado">
+                    <img src="Iconos/sello.png" class="sello-dorado">
+                </div>
+
+                <div class="contenedor-firmas">
+                    <div class="col-firma">
+                        <div class="linea-firma"></div>
+                        <p class="nombre-firma">${firmas.director}</p>
+                        <p class="puesto-firma">Director General</p>
+                    </div>
+                    <div class="col-firma">
+                        <div class="linea-firma"></div>
+                        <p class="nombre-firma">${firmas.controlEscolar}</p>
+                        <p class="puesto-firma">Control Escolar</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    `;
+        `;
         }
     </script>
+
 </body>
 
 </html>
