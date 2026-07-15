@@ -693,9 +693,10 @@
             return nivelTexto;
         }
 
+        // FUNCIÓN MODIFICADA: Ahora redondea al entero más cercano sin decimales.
         const fmt = (v) => {
             if (v === undefined || v === null || v === "" || isNaN(v)) return '-';
-            return (Math.floor(parseFloat(v) * 10) / 10).toFixed(1);
+            return Math.round(parseFloat(v)).toString();
         };
 
         function buscarBoletasExcel() {
